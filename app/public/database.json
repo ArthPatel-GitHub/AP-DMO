@@ -1,0 +1,272 @@
+[
+  {
+    "id": "school-hymn",
+    "title": "School Hymn (Lord of our life)",
+    "lyrics": "Lord of our life, and God of our salvation,\nStar of our night, and hope of every nation,\nHear and receive Thy Church's supplication,\nLord God Almighty.\n\nLord, Thou canst help when earthly armour faileth;\nLord, Thou canst save when deadly sin assaileth;\nLord, o'er Thy Church nor death nor hell prevaileth;\nGrant us Thy peace, Lord.",
+    "history": "The traditional foundation hymn sung by all students.",
+    "audioUrl": "/audio/lord-of-our-life.mp3",
+    "type": "hymn",
+    "durationInSeconds": 210
+  },
+  {
+    "id": "jerusalem",
+    "title": "Jerusalem",
+    "lyrics": "And did those feet in ancient time\nWalk upon England's mountains green?\nAnd was the holy Lamb of God\nOn England's pleasant pastures seen?",
+    "history": "A powerful anthem traditionally sung with pride.",
+    "audioUrl": "/audio/jerusalem.mp3",
+    "type": "anthem",
+    "durationInSeconds": 165
+  },
+  {
+    "id": "abide-with-me",
+    "title": "Abide With Me",
+    "lyrics": "Abide with me; fast falls the eventide;\nThe darkness deepens; Lord, with me abide.\nWhen other helpers fail and comforts flee,\nHelp of the helpless, oh, abide with me.",
+    "history": "A deeply respected hymn for evening chapel.",
+    "audioUrl": "/audio/abide-with-me.mp3",
+    "type": "hymn",
+    "durationInSeconds": 235
+  },
+  {
+    "id": "guide-me",
+    "title": "Guide Me, O Thou Great Redeemer",
+    "lyrics": "Guide me, O Thou great Redeemer,\nPilgrim through this barren land;\nI am weak, but Thou art mighty;\nHold me with Thy powerful hand.",
+    "history": "A classic hymn for public services.",
+    "audioUrl": "/audio/guide-me.mp3",
+    "type": "hymn",
+    "durationInSeconds": 198
+  },
+  {
+    "id": "amazing-grace",
+    "title": "Amazing Grace",
+    "lyrics": "Amazing grace! How sweet the sound\nThat saved a wretch like me!\nI once was lost, but now am found;\nWas blind, but now I see.",
+    "history": "Universally recognized hymn for reflection.",
+    "audioUrl": "/audio/amazing-grace.mp3",
+    "type": "hymn",
+    "durationInSeconds": 245
+  },
+  {
+    "id": "how-great-thou-art",
+    "title": "How Great Thou Art",
+    "lyrics": "O Lord, my God, when I in awesome wonder\nConsider all the worlds Thy Hands have made;\nI see the stars, I hear the rolling thunder.",
+    "history": "A powerful piece with deep structural dynamics.",
+    "audioUrl": "/audio/how-great-thou-art.mp3",
+    "type": "hymn",
+    "durationInSeconds": 270
+  },
+  {
+    "id": "be-thou-my-vision",
+    "title": "Be Thou My Vision",
+    "lyrics": "Be Thou my Vision, O Lord of my heart;\nNaught be all else to me, save that Thou art;\nThou my best thought, by day or by night.",
+    "history": "An ancient melody for quiet evening chapel.",
+    "audioUrl": "/audio/be-thou-my-vision.mp3",
+    "type": "hymn",
+    "durationInSeconds": 185
+  },
+  {
+    "id": "nz-anthem",
+    "title": "God Defend New Zealand",
+    "lyrics": "God of Nations at Thy feet,\nIn the bonds of love we meet,\nHear our voices, we entreat,\nGod defend our free land.",
+    "history": "The national anthem, practiced for accuracy.",
+    "audioUrl": "/audio/nz-anthem.mp3",
+    "type": "anthem",
+    "durationInSeconds": 150
+  },
+  {
+    "id": "swing-low",
+    "title": "Swing Low, Sweet Chariot",
+    "lyrics": "Swing low, sweet chariot,\nComing for to carry me home,\nSwing low, sweet chariot.",
+    "history": "Used to build camaraderie and school pride.",
+    "audioUrl": "/audio/swing-low.mp3",
+    "type": "anthem",
+    "durationInSeconds": 135
+  },
+  {
+    "id": "lord-of-the-dance",
+    "title": "Lord of the Dance",
+    "lyrics": "I danced in the morning when the world was begun,\nAnd I danced in the moon and the stars and the sun.",
+    "history": "Based on the Shaker song 'Simple Gifts'.",
+    "audioUrl": "/audio/lord-of-the-dance.mp3",
+    "type": "hymn",
+    "durationInSeconds": 195
+  },
+  {
+    "id": "country-roads",
+    "title": "Take Me Home, Country Roads",
+    "lyrics": "Almost heaven, West Virginia,\nBlue Ridge Mountains, Shenandoah River.",
+    "history": "The legendary 1971 country-folk anthem.",
+    "audioUrl": "/audio/country-roads.mp3",
+    "type": "anthem",
+    "durationInSeconds": 198
+  },
+  {
+    "id": "viva-la-vida",
+    "title": "Viva La Vida",
+    "lyrics": "I used to rule the world,\nSeas would rise when I gave the word.",
+    "history": "Features historical baroque themes.",
+    "audioUrl": "/audio/viva-la-vida.mp3",
+    "type": "anthem",
+    "durationInSeconds": 242
+  },
+  {
+    "id": "let-it-be",
+    "title": "Let It Be",
+    "lyrics": "When I find myself in times of trouble,\nMother Mary comes to me.",
+    "history": "Iconic 1970 gospel-rock ballad.",
+    "audioUrl": "/audio/let-it-be.mp3",
+    "type": "hymn",
+    "durationInSeconds": 243
+  },
+  {
+    "id": "tutira-mai",
+    "title": "Tūtira Mai Ngā Iwi",
+    "lyrics": "Tūtira mai ngā iwi, tātou tātou e\nTūtira mai ngā iwi, tātou tātou e.",
+    "history": "A powerful anthem of unity for the community.",
+    "audioUrl": "/audio/tutira-mai.mp3",
+    "type": "anthem",
+    "durationInSeconds": 140
+  },
+  {
+    "id": "he-honore",
+    "title": "He Hōnore",
+    "lyrics": "He hōnore, he korōria\nMaungārongo ki te whenua\nWhakaaro pai e.",
+    "history": "Used as an opening prayer for peace.",
+    "audioUrl": "/audio/he-honore.mp3",
+    "type": "hymn",
+    "durationInSeconds": 160
+  },
+  {
+    "id": "te-aroha",
+    "title": "Te Aroha",
+    "lyrics": "Te aroha,\nTe whakapono,\nTe rangimārie.",
+    "history": "Embodying the values of love, faith, and peace.",
+    "audioUrl": "/audio/te-aroha.mp3",
+    "type": "hymn",
+    "durationInSeconds": 90
+  },
+  {
+    "id": "morning-has-broken",
+    "title": "Morning Has Broken",
+    "lyrics": "Morning has broken, like the first morning,\nBlackbird has spoken, like the first bird.",
+    "history": "Gentle melodic hymn for mornings.",
+    "audioUrl": "/audio/morning-has-broken.mp3",
+    "type": "hymn",
+    "durationInSeconds": 160
+  },
+  {
+    "id": "i-vow-to-thee",
+    "title": "I Vow to Thee, My Country",
+    "lyrics": "I vow to thee, my country, all earthly things above,\nEntire and whole and perfect.",
+    "history": "Solemn anthem for memorial services.",
+    "audioUrl": "/audio/i-vow-to-thee.mp3",
+    "type": "anthem",
+    "durationInSeconds": 200
+  },
+  {
+    "id": "thine-be-the-glory",
+    "title": "Thine Be the Glory",
+    "lyrics": "Thine be the glory, risen, conquering Son,\nEndless is the victory.",
+    "history": "Triumphant hymn for festivals.",
+    "audioUrl": "/audio/thine-be-the-glory.mp3",
+    "type": "hymn",
+    "durationInSeconds": 215
+  },
+  {
+    "id": "when-the-saints",
+    "title": "When the Saints",
+    "lyrics": "When the saints go marching in,\nWhen the saints go marching in,\nWhen the saints go marching in,\nAll glory, all glory.",
+    "history": "Energetic hymn for worship services.",
+    "audioUrl": "/audio/when-the-saints.mp3",
+    "type": "hymn",
+    "durationInSeconds": 250
+  },
+  {
+    "id": "o-come-all-ye",
+    "title": "O Come, All Ye Faithful",
+    "lyrics": "O come, all ye faithful, joyful and triumphant,\nO come ye, O come ye to Bethlehem.",
+    "history": "Traditional seasonal hymn.",
+    "audioUrl": "/audio/o-come-all-ye.mp3",
+    "type": "hymn",
+    "durationInSeconds": 220
+  },
+  {
+    "id": "silent-night",
+    "title": "Silent Night",
+    "lyrics": "Silent night, holy night, all is calm,\nAll is bright round yon virgin mother and child.",
+    "history": "Famous quiet reflective carol.",
+    "audioUrl": "/audio/silent-night.mp3",
+    "type": "hymn",
+    "durationInSeconds": 180
+  },
+  {
+    "id": "joy-to-the-world",
+    "title": "Joy to the World",
+    "lyrics": "Joy to the world, the Lord is come!\nLet earth receive her King.",
+    "history": "Exuberant celebratory hymn.",
+    "audioUrl": "/audio/joy-to-the-world.mp3",
+    "type": "hymn",
+    "durationInSeconds": 165
+  },
+  {
+    "id": "holding-out-for-a-hero",
+    "title": "Holding Out for a Hero",
+    "lyrics": "Where have all the good men gone.\nWhere are all the gods.",
+    "history": "Iconic 1980 anthem.",
+    "audioUrl": "/audio/holding-out-for-a-hero.mp3",
+    "type": "anthem",
+    "durationInSeconds": 243
+  },
+  {
+    "id": "crown-him-with-many-crowns",
+    "title": "Crown Him with Many Crowns",
+    "lyrics": "Crown Him with many crowns, the Lamb upon His throne;\nHark! how the heavenly anthem drowns all music but its own.",
+    "history": "A majestic hymn celebrating majesty and victory.",
+    "audioUrl": "/audio/crown-him-with-many-crowns.mp3",
+    "type": "hymn",
+    "durationInSeconds": 210
+  },
+  {
+    "id": "Kotahitanga",
+    "title": "Kotahitanga",
+    "lyrics": "Kotahitanga, kotahitanga,\nKo te tāngata e kōrero ana.",
+    "history": "A powerful anthem of unity and shared purpose.",
+    "audioUrl": "/audio/kotahitanga.mp3",
+    "type": "anthem",
+    "durationInSeconds": 175
+  },
+  {
+    "id": "great-is-thy-faithfulness",
+    "title": "Great Is Thy Faithfulness",
+    "lyrics": "Great is Thy faithfulness, O God my Father;\nThere is no shadow of turning with Thee.",
+    "history": "A popular 20th-century hymn of devotion and gratitude.",
+    "audioUrl": "/audio/great-is-thy-faithfulness.mp3",
+    "type": "hymn",
+    "durationInSeconds": 260
+  },
+  {
+    "id": "youll-never-walk-alone",
+    "title": "You'll Never Walk Alone",
+    "lyrics": "When you walk through a storm, hold your head up high,\nAnd don't be afraid of the dark.",
+    "history": "A globally recognized showtune turned stirring solidarity anthem.",
+    "audioUrl": "/audio/youll-never-walk-alone.mp3",
+    "type": "anthem",
+    "durationInSeconds": 160
+  },
+  {
+    "id": "drunken-sailor",
+    "title": "The Drunken Sailor",
+    "lyrics": "Oh, the drunks are all a-roaming,\nAnd the girls are all a-singing.",
+    "history": "A traditional sea shanty with a lively tune.",
+    "audioUrl": "/audio/the-drunken-sailor.mp3",
+    "type": "anthem",
+    "durationInSeconds": 180
+  },
+  {
+    "id": "sweet-caroline",
+    "title": "Sweet Caroline",
+    "lyrics": "Where it began, I can't begin to knowing,\nBut then I know it's growing strong.",
+    "history": "An iconic pop classic frequently used as a arena crowd anthem.",
+    "audioUrl": "/audio/sweet-caroline.mp3",
+    "type": "anthem",
+    "durationInSeconds": 201
+  }
+]

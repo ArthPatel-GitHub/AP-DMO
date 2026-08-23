@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account Settings - Rathkeale College Song Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth-widget.css" />
+</head>
+<body>
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="songs.html" class="nav-link">Catalogue</a>
+      <a href="player.html" class="nav-link">Player</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <div id="auth-widget"></div>
+    </nav>
+
+    <header class="app-branding-container">
+      <div class="brand-identity-block">
+        <h1>Account Settings</h1>
+        <p>Manage your email address and password</p>
+      </div>
+    </header>
+
+    <!-- Shown when NOT logged in -->
+    <div id="guest-state" style="display: none;">
+      <div class="player-empty-state">
+        <div class="player-empty-icon">🔒</div>
+        <h2 class="player-empty-title">Not Signed In</h2>
+        <p class="player-empty-text">
+          You need to be signed in to access account settings.
+        </p>
+        <a href="login.html" class="player-empty-btn">Go to Login</a>
+      </div>
+    </div>
+
+    <!-- Shown when logged in -->
+    <div id="settings-state" style="display: none;">
+
+      <!-- Identity card -->
+      <div class="widget" style="margin-bottom: 30px;">
+        <div class="widget-title">Signed In As</div>
+        <p class="widget-text" id="account-identity"></p>
+      </div>
+
+      <!-- Change Email -->
+      <section class="content-block" style="margin-bottom: 30px;">
+        <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-green); padding-left: 10px;">Change Email</h2>
+        <form id="change-email-form" class="request-form">
+          <div class="form-group">
+            <label for="new-email" class="form-label">New Email Address</label>
+            <input type="email" id="new-email" class="form-input" placeholder="your-new-email@example.com" maxlength="100" required />
+          </div>
+          <button type="submit" class="btn submit-btn">Update Email</button>
+        </form>
+        <p id="email-error" style="color: var(--brand-red); font-weight: 600; margin-top: 12px; display: none;"></p>
+      </section>
+
+      <!-- Change Password -->
+      <section class="content-block" style="margin-bottom: 30px;">
+        <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-green); padding-left: 10px;">Change Password</h2>
+        <form id="change-password-form" class="request-form">
+          <div class="form-group">
+            <label for="current-password" class="form-label">Current Password</label>
+            <input type="password" id="current-password" class="form-input" placeholder="Your current password" maxlength="32" required />
+          </div>
+          <div class="form-group">
+            <label for="new-password" class="form-label">New Password</label>
+            <input type="password" id="new-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
+            <small class="form-help-text">
+              Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="confirm-new-password" class="form-label">Confirm New Password</label>
+            <input type="password" id="confirm-new-password" class="form-input" placeholder="Re-enter new password" maxlength="32" required />
+          </div>
+          <button type="submit" class="btn submit-btn">Update Password</button>
+        </form>
+        <p id="password-error" style="color: var(--brand-red); font-weight: 600; margin-top: 12px; display: none;"></p>
+      </section>
+
+      <!-- Sign Out -->
+      <section class="content-block">
+        <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-red); padding-left: 10px;">Sign Out</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">You will be returned to the home page.</p>
+        <button type="button" id="signout-btn" class="btn" style="background: linear-gradient(135deg, var(--brand-red) 0%, #b91c1c 100%);">Sign Out</button>
+      </section>
+
+    </div>
+
+    <footer class="app-footer">
+      <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script src="/js/types.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/App.js"></script>
+  <script src="/js/account-page.js"></script>
+  <script src="/js/auth-widget.js"></script>
+</body>
+</html>

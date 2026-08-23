@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home - Rathkeale College Song Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth-widget.css" />
+</head>
+<body>
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="songs.html" class="nav-link">Catalogue</a>
+      <a href="player.html" class="nav-link">Player</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <div id="auth-widget"></div>
+    </nav>
+
+    <header class="app-branding-container home-header">
+      <div class="brand-identity-block">
+        <h1>Rathkeale College</h1>
+        <p>Song & Tradition Portal</p>
+      </div>
+    </header>
+
+    <div class="widget home-widget">
+      <div class="widget-title">Today's Practice Target</div>
+      <div id="schedule-text" class="widget-text home-widget-text">Checking calendar schedule...</div>
+    </div>
+
+    <div class="dashboard-grid">
+      <a href="songs.html" class="dashboard-card">
+        <h2>📚 Song Catalogue</h2>
+        <p>Browse, search, and filter the complete collection of school music.</p>
+      </a>
+      
+      <a href="player.html" class="dashboard-card">
+        <h2>🎧 Active Player</h2>
+        <p>Jump back into your current streaming session and flashcards.</p>
+      </a>
+
+      <a href="contact.html" class="dashboard-card">
+        <h2>✉️ Requests</h2>
+        <p>Notice a missing song or audio issue? Send a quick request.</p>
+      </a>
+    </div>
+    <footer class="app-footer">
+      <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>
+    </footer>
+  </div>
+  <script src="/js/types.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/App.js"></script>
+  <script src="/js/auth-widget.js"></script>
+</body>
+</html>

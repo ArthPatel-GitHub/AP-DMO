@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catalogue - Rathkeale College Song Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth-widget.css" />
+</head>
+<body>
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="songs.html" class="nav-link active">Catalogue</a>
+      <a href="player.html" class="nav-link">Player</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <div id="auth-widget"></div>
+    </nav>
+
+    <header class="app-branding-container">
+      <div class="brand-identity-block">
+        <h1>Song Library</h1>
+        <p>Browse and filter the complete collection</p>
+      </div>
+      <div class="search-bar-wrapper">
+        <input type="text" id="search-input" placeholder="Search titles or contexts..." maxlength="50" autocomplete="off" />
+      </div>
+    </header>
+
+    <div class="filter-dashboard">
+      <div class="filter-group">
+        <span class="filter-label">TYPE:</span>
+        <button class="btn filter-btn active" id="filter-all-type">All Types</button>
+        <button class="btn filter-btn" id="filter-hymn">Hymns</button>
+        <button class="btn filter-btn" id="filter-anthem">Anthems</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">LENGTH:</span>
+        <button class="btn filter-btn active" id="filter-all-len">Any Length</button>
+        <button class="btn filter-btn" id="filter-short">Short (< 3m)</button>
+        <button class="btn filter-btn" id="filter-long">Long (3m+)</button>
+      </div>
+      <div class="filter-group filter-favourites-group" id="favourites-filter-group">
+        <!-- Populated by App.js based on login state -->
+      </div>
+    </div>
+
+    <div class="catalogue-layout-zone">
+      <div id="songs-container"></div>
+    </div>
+    <footer class="app-footer">
+      <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script src="/js/types.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/App.js"></script>
+  <script src="/js/auth-widget.js"></script>
+</body>
+</html>
