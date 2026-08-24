@@ -982,12 +982,15 @@ body {
   white-space: nowrap;
 }
 
-/* UPDATED: Positions the dropdown to the immediate right of the trigger */
+/* Opens downward, right-aligned to the trigger - keeps the
+   dropdown fully on-screen even when the trigger sits at the
+   far right edge of the nav bar, instead of pushing off-screen
+   to the side and forcing horizontal scroll. */
 .auth-widget-dropdown {
   position: absolute;
-  top: 0;
-  left: calc(100% + 12px); 
-  right: auto;
+  top: calc(100% + 10px);
+  right: 0;
+  left: auto;
   min-width: 190px;
   width: 190px;
   background: #111827;
@@ -1064,13 +1067,30 @@ body {
     justify-content: center;
     margin-top: 10px;
   }
-  
+
   .auth-widget-dropdown {
-    top: calc(100% + 8px);
     left: 50%;
     right: auto;
     transform: translateX(-50%);
   }
+}
+/* Ensure the nav bar and auth widget always sit above other
+   page content (like the search bar) in the stacking order, so
+   clicks on the account button never get intercepted by
+   something visually overlapping it. */
+.main-nav {
+  position: relative;
+  z-index: 100;
+}
+
+.auth-widget-wrapper {
+  position: relative;
+  z-index: 101;
+}
+
+.auth-widget-trigger {
+  position: relative;
+  z-index: 102;
 }
 
 /* ==========================================
