@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact - Rathkeale College Song Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth-widget.css" />
+</head>
+<body>
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="songs.html" class="nav-link">Catalogue</a>
+      <a href="player.html" class="nav-link">Player</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link active">Contact</a>
+      <div id="auth-widget"></div>
+    </nav>
+
+    <header class="app-branding-container">
+      <div class="brand-identity-block">
+        <h1>Submit a Request</h1>
+        <p>Report broken audio, missing lyrics, or suggest new tracks.</p>
+      </div>
+    </header>
+
+    <!-- Highlighted 1-3 Day Turnaround Notice Box -->
+    <div class="notice-box" style="margin-bottom: 25px;">
+      <p style="margin: 0;">
+        ⏳ <strong>Processing Notice:</strong> To ensure data accuracy, all submitted fixes, technical bug reports, or song additions are manually processed. Updates typically take <strong>1 to 3 days</strong> to reflect live on the portal.
+      </p>
+    </div>
+
+    <!-- Shown only when logged in: confirms who the request is being submitted as -->
+    <div id="logged-in-identity-notice" class="widget" style="display: none; margin-bottom: 25px;">
+      <div class="widget-title">Submitting As</div>
+      <p class="widget-text" id="logged-in-identity-text"></p>
+    </div>
+
+    <!-- Shown only when logged out: explains the slower turnaround for unidentified requests -->
+    <div id="logged-out-notice" class="notice-box" style="margin-bottom: 25px; display: none;">
+      <p style="margin: 0;">
+        ⚠️ <strong>Not logged in:</strong> Requests submitted without an account may take longer to action,
+        since they can't be matched to an existing account. <a href="login.html" style="color: inherit; text-decoration: underline;">Log in or sign up</a> for faster handling.
+      </p>
+    </div>
+
+    <!-- Form configured for traditional FormSubmit Redirect -->
+    <form action="https://formsubmit.co/arthtanmaypatel@gmail.com" method="POST" class="request-form" id="contact-form">
+
+      <!-- Visible only when logged OUT - removed from the DOM entirely when logged in -->
+      <div class="form-group" id="name-field-group">
+        <label for="user-name" class="form-label">Full Name</label>
+        <input type="text" id="user-name" name="user-name" class="form-input" placeholder="e.g. John Smith" maxlength="60" />
+      </div>
+
+      <div class="form-group" id="id-field-group">
+        <label for="user-id" class="form-label">Identification</label>
+        <input 
+          type="text" 
+          id="user-id" 
+          name="user-id" 
+          class="form-input"
+          placeholder="Student ID (e.g: 123456) or Staff Initials (e.g: ABC)" 
+          pattern="^(\d{6,8}|[A-Za-z]{3})$"
+          title="Please enter a 6 to 8 digit Student ID, or 3-letter Staff Initials."
+          maxlength="8"
+        />
+        <small class="form-help-text">
+          Students: Enter your 6-8 digit ID. Staff: Enter your 3-letter initials.
+        </small>
+      </div>
+
+      <!-- Hidden fields populated by JS when logged in, so FormSubmit still receives name/ID -->
+      <input type="hidden" id="hidden-user-name" name="user-name" />
+      <input type="hidden" id="hidden-user-id" name="user-id" />
+
+      <div class="form-group">
+        <label for="request-message" class="form-label">Your Message / Request</label>
+        <textarea id="request-message" name="request-message" class="form-input" rows="5" placeholder="Tell us what needs changing or adding..." maxlength="250" required></textarea>
+        <small class="form-help-text" id="message-char-count">0 / 250 characters</small>
+      </div>
+
+      <button type="submit" class="btn submit-btn">Submit Request</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script src="/js/types.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/App.js"></script>
+  <script src="/js/contact-page.js"></script>
+  <script src="/js/auth-widget.js"></script>
+</body>
+</html>

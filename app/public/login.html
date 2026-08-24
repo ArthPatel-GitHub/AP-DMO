@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - Rathkeale College Song Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="auth-widget.css" />
+</head>
+<body>
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="songs.html" class="nav-link">Catalogue</a>
+      <a href="player.html" class="nav-link">Player</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <div id="auth-widget"></div>
+    </nav>
+
+    <header class="app-branding-container">
+      <div class="brand-identity-block">
+        <h1>Account Access</h1>
+        <p>Sign in or create a student/staff account</p>
+      </div>
+    </header>
+
+    <!-- Scope notice: this is a local browser-only demo, not a real shared account system -->
+    <div class="notice-box" style="margin-bottom: 15px;">
+      <p style="margin: 0;">
+        🔒 <strong>Demo Notice:</strong> Accounts on this page are stored only in your own browser
+        for demonstration purposes — there is no shared school server. Try the seeded demo accounts below,
+        or sign up with your own placeholder details.
+      </p>
+    </div>
+
+    <p style="margin-bottom: 25px;">
+      <button type="button" id="reset-data-btn" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); font-size: 0.75rem; padding: 8px 14px;">
+        🗑️ Reset Demo Data
+      </button>
+      <span class="form-help-text" style="margin-left: 8px;">Wipes all accounts in this browser and re-seeds the demo accounts. Useful while testing.</span>
+    </p>
+
+    <!-- Logged-in state: shown instead of the forms once a user is signed in -->
+    <div id="logged-in-panel" class="widget" style="display: none;">
+      <div class="widget-title">Signed In</div>
+      <p class="widget-text" id="welcome-message">Welcome back!</p>
+      <button id="logout-btn" class="btn" style="margin-top: 15px;">Log Out</button>
+    </div>
+
+    <!-- Forms panel: hidden once a user is logged in -->
+    <div id="auth-forms-panel">
+
+      <div class="filter-dashboard" style="margin-bottom: 25px;">
+        <div class="filter-group" style="margin-bottom: 0;">
+          <button class="btn filter-btn active" id="tab-login">Log In</button>
+          <button class="btn filter-btn" id="tab-signup">Sign Up</button>
+        </div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="request-form">
+        <div class="form-group">
+          <label for="login-id-email" class="form-label">Student ID, Staff Initials, or Email</label>
+          <input type="text" id="login-id-email" class="form-input" placeholder="e.g. 123456 or JSM" maxlength="100" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Your password" maxlength="32" required />
+        </div>
+        <button type="submit" class="btn submit-btn">Log In</button>
+        <p class="form-help-text" style="margin-top: 12px;">
+          Demo student: <strong>123456</strong> / <strong>Demo123!</strong> (security answer: <strong>rex</strong>) &nbsp;|&nbsp;
+          Demo staff: <strong>JSM</strong> / <strong>Demo123!</strong> (security answer: <strong>smith</strong>)
+        </p>
+        <p class="form-help-text" style="margin-top: 10px;">
+          <a href="forgot-password.html" style="color: var(--brand-green);">Forgot your password?</a>
+        </p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="request-form" style="display: none;">
+        <div class="form-group">
+          <label for="signup-name" class="form-label">Full Name</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="e.g. John Smith" maxlength="60" required />
+        </div>
+        <div class="form-group">
+          <label for="signup-id" class="form-label">Identification</label>
+          <input
+            type="text"
+            id="signup-id"
+            class="form-input"
+            placeholder="Student ID (6-8 digits) or Staff Initials (3 letters)"
+            maxlength="8"
+            required
+          />
+          <small class="form-help-text">
+            Students: Enter your 6-8 digit ID. Staff: Enter your 3-letter initials.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="signup-email" class="form-label">Email</label>
+          <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" maxlength="100" required />
+        </div>
+        <div class="form-group">
+          <label for="signup-password" class="form-label">Password</label>
+          <input type="password" id="signup-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
+          <small class="form-help-text">
+            Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="signup-security-question" class="form-label">Security Question</label>
+          <select id="signup-security-question" class="form-input" required>
+            <option value="" disabled selected>Choose a question...</option>
+          </select>
+          <small class="form-help-text">
+            Used to reset your password if you forget it. Choose one you'll always remember the answer to.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="signup-security-answer" class="form-label">Answer</label>
+          <input type="text" id="signup-security-answer" class="form-input" placeholder="Your answer" maxlength="50" required />
+          <small class="form-help-text" style="color: var(--accent-amber);">
+            ⚠️ This answer cannot be recovered if you forget it — write it down somewhere safe.
+          </small>
+        </div>
+        <button type="submit" class="btn submit-btn">Sign Up</button>
+      </form>
+
+      <!-- Inline error message area -->
+      <p id="auth-error-message" style="color: var(--brand-red); font-weight: 600; margin-top: 15px; display: none;"></p>
+
+    </div>
+
+    <footer class="app-footer">
+      <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script src="/js/types.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/App.js"></script>
+  <script src="/js/login-page.js"></script>
+  <script src="/js/auth-widget.js"></script>
+</body>
+</html>

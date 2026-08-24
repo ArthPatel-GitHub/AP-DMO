@@ -76,15 +76,16 @@ window.addEventListener('DOMContentLoaded', () => {
     
   // I added a debounce here so the search doesn't lag if I type too fast
   const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    let debounceTimeoutPointer;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(debounceTimeoutPointer);
-      debounceTimeoutPointer = setTimeout(() => {
-        executeCompoundFiltering(); 
-      }, 250); 
-    });
-  }
+if (searchInput) {
+  let debounceTimeoutPointer;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(debounceTimeoutPointer);
+    debounceTimeoutPointer = setTimeout(() => {
+      executeCompoundFiltering();
+      renderSearchSuggestions(searchInput.value); // NEW
+    }, 250);
+  });
+}
 
   // If login/logout happens via the nav auth-widget while this
   // page is open, reload so the favourite hearts and the "My
@@ -767,3 +768,69 @@ function executeCompoundFiltering() {
 
   renderSongCatalogue(filteredSongs);
 }
+// ==========================================
+// 9. LIVE SEARCH SUGGESTIONS
+// ==========================================
+// Builds a dropdown of matching songs as the user types, so they
+// can jump straight to a song without submitting the full search
+// or scrolling the catalogue. Reuses the same debounced input
+// listener already wired up for executeCompoundFiltering, rather
+// than adding a second listener on the same input.
+
+function renderSearchSuggestions(searchString) {
+  const dropdown = document.getElementById('suggestions-dropdown');
+  if (!dropdown) return; // safety guard - not every page has this element
+
+  dropdown.innerHTML = '';
+
+  if (searchString.trim().length === 0) {
+    dropdown.classList.add('hidden');
+    return;
+  }
+
+  const matches = songsDatabase.filter(song =>
+    song.title.toLowerCase().includes(searchString.toLowerCase())
+  );
+
+  if (matches.length === 0) {
+    dropdown.classList.add('hidden');
+    return;
+  }
+
+  // Cap at 6 results so the dropdown never overwhelms the screen
+  matches.slice(0, 6).forEach(song => {
+    const item = document.createElement('div');
+    item.className = 'suggestion-item';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'suggestion-title';
+    titleSpan.textContent = song.title;
+
+    const metaSpan = document.createElement('span');
+    metaSpan.className = 'suggestion-meta';
+    metaSpan.textContent = song.type;
+
+    item.appendChild(titleSpan);
+    item.appendChild(metaSpan);
+
+    item.addEventListener('click', () => {
+      window.location.href = `player.html?song=${song.id}`;
+    });
+
+    dropdown.appendChild(item);
+  });
+
+  dropdown.classList.remove('hidden');
+}
+
+// Close the dropdown when clicking anywhere outside it - same
+// pattern already used for the auth widget's dropdown.
+document.addEventListener('click', (event) => {
+  const dropdown = document.getElementById('suggestions-dropdown');
+  const searchInput = document.getElementById('search-input');
+  if (!dropdown || !searchInput) return;
+
+  if (!dropdown.contains(event.target) && event.target !== searchInput) {
+    dropdown.classList.add('hidden');
+  }
+});

@@ -688,6 +688,39 @@ body {
   letter-spacing: 0.1em;
 }
 /* ==========================================
+   TABLET BREAKPOINT (769px - 1024px)
+   ========================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #songs-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .app-branding-container {
+    gap: 24px;
+  }
+}
+
+/* ==========================================
+   MOBILE PLAYER CONTROL FIX
+   ========================================== */
+@media (max-width: 768px) {
+  .control-button-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .control-button-row .btn {
+    flex: 1 1 40%;
+    justify-content: center;
+    font-size: 0.75rem;
+    padding: 10px 14px;
+  }
+
+  #songs-container {
+    grid-template-columns: 1fr;
+  }
+}
+/* ==========================================
    10. SITE NAVIGATION BAR
    ========================================== */
 .main-nav {
