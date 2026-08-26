@@ -186,7 +186,7 @@ function renderSongCatalogue(songsArray) {
 
     const loadButton = document.createElement('button');
     loadButton.className = 'btn';
-    loadButton.textContent = '⚙️ Play';
+    loadButton.textContent = '▶️ Play';
     
     // Clicking this sends the user to the player page with the song ID in the URL
     loadButton.addEventListener('click', () => {
@@ -430,59 +430,47 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   buttonRow.style.justifyContent = 'center';
   buttonRow.style.marginBottom = '20px';
 
-  const prevButton = document.createElement('button');
-  prevButton.className = 'btn';
-  prevButton.innerHTML = '⏮️ Previous';
-  if (playbackHistoryStack.length <= 1) {
-    prevButton.style.opacity = '0.3';
-    prevButton.style.cursor = 'not-allowed';
+const prevButton = document.createElement('button');
+prevButton.className = 'btn btn-nav';
+prevButton.innerHTML = '⏮️ Previous';
+if (playbackHistoryStack.length <= 1) {
+  prevButton.disabled = true;
+} else {
+  prevButton.addEventListener('click', handleNavigationBackwards);
+}
+
+// I set up my custom play/pause toggle here to control the Audio element
+const playPauseButton = document.createElement('button');
+playPauseButton.className = 'btn btn-play';
+playPauseButton.innerHTML = '⏸️ Pause';
+playPauseButton.addEventListener('click', () => {
+  if (currentAudioElement.paused) {
+    currentAudioElement.play();
+    playPauseButton.innerHTML = '⏸️ Pause';
+    playPauseButton.classList.remove('is-paused');
   } else {
-    prevButton.addEventListener('click', handleNavigationBackwards);
+    currentAudioElement.pause();
+    playPauseButton.innerHTML = '▶️ Play';
+    playPauseButton.classList.add('is-paused');
   }
+});
 
-  // I set up my custom play/pause toggle here to control the Audio element
-  const playPauseButton = document.createElement('button');
-  playPauseButton.className = 'btn';
-  playPauseButton.style.background = 'linear-gradient(135deg, var(--brand-green) 0%, #059669 100%)';
-  playPauseButton.innerHTML = '⏸️ Pause';
-  playPauseButton.addEventListener('click', () => {
-    if (currentAudioElement.paused) {
-      currentAudioElement.play();
-      playPauseButton.innerHTML = '⏸️ Pause';
-      playPauseButton.style.background = 'linear-gradient(135deg, var(--brand-green) 0%, #059669 100%)';
-    } else {
-      currentAudioElement.pause();
-      playPauseButton.innerHTML = '▶️ Play';
-      playPauseButton.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, #4f46e5 100%)';
-    }
-  });
+const forwardButton = document.createElement('button');
+forwardButton.className = 'btn btn-nav';
+forwardButton.innerHTML = 'Next ⏭️';
+forwardButton.addEventListener('click', handleNavigationForward);
 
-  const forwardButton = document.createElement('button');
-  forwardButton.className = 'btn';
-  forwardButton.innerHTML = 'Next ⏭️';
-  forwardButton.addEventListener('click', handleNavigationForward);
+const downloadButton = document.createElement('a');
+downloadButton.className = 'btn btn-download';
+downloadButton.href = activeSong.audioUrl;
+downloadButton.download = `${activeSong.title.replace(/\s+/g, '_')}_Practice_Track.mp3`;
+downloadButton.innerHTML = '📥 Download';
+downloadButton.addEventListener('click', () => {
+  if (notificationEngine) notificationEngine.success('Downloading media file...');
+});
 
-  const downloadButton = document.createElement('a');
-  downloadButton.className = 'btn';
-  downloadButton.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-  downloadButton.style.textDecoration = 'none';
-  downloadButton.style.display = 'inline-flex';
-  downloadButton.style.alignItems = 'center';
-  downloadButton.href = activeSong.audioUrl;
-  downloadButton.download = `${activeSong.title.replace(/\s+/g, '_')}_Practice_Track.mp3`;
-  downloadButton.innerHTML = '📥 Download';
-  downloadButton.addEventListener('click', () => {
-    if (notificationEngine) notificationEngine.success('Downloading media file...');
-  });
-
-  const speedController = document.createElement('select');
-  speedController.className = 'btn';
-  speedController.style.background = 'rgba(255, 255, 255, 0.05)';
-  speedController.style.border = '1px solid var(--glass-border)';
-  speedController.style.color = '#ffffff';
-  speedController.style.cursor = 'pointer';
-  speedController.style.appearance = 'none'; 
-  speedController.style.padding = '12px 20px';
+const speedController = document.createElement('select');
+speedController.className = 'btn btn-speed-select';
 
   
   const speedOptions = [

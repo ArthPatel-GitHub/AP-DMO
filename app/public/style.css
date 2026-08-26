@@ -724,6 +724,9 @@ body {
    10. SITE NAVIGATION BAR
    ========================================== */
 .main-nav {
+  position: sticky;
+  top: 20px;
+  z-index: 100;
   display: flex;
   justify-content: center;
   gap: 30px;
@@ -925,10 +928,6 @@ body {
    11. AUTH WIDGET (nav-bar login indicator)
    ========================================== */
 
-.main-nav {
-  position: relative;
-}
-
 #auth-widget {
   margin-left: auto;
 }
@@ -1078,11 +1077,6 @@ body {
    page content (like the search bar) in the stacking order, so
    clicks on the account button never get intercepted by
    something visually overlapping it. */
-.main-nav {
-  position: relative;
-  z-index: 100;
-}
-
 .auth-widget-wrapper {
   position: relative;
   z-index: 101;
