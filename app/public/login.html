@@ -71,16 +71,16 @@
           <input type="text" id="login-id-email" class="form-input" placeholder="e.g. 123456 or JSM" maxlength="100" required />
         </div>
         <div class="form-group">
-          <label for="login-password" class="form-label">Password</label>
-          <input type="password" id="login-password" class="form-input" placeholder="Your password" maxlength="32" required />
-        </div>
+  <label for="login-password" class="form-label">Password</label>
+  <input type="password" id="login-password" class="form-input" placeholder="Your password" maxlength="32" required />
+</div>
         <button type="submit" class="btn submit-btn">Log In</button>
         <p class="form-help-text" style="margin-top: 12px;">
           Demo student: <strong>123456</strong> / <strong>Demo123!</strong> (security answer: <strong>rex</strong>) &nbsp;|&nbsp;
           Demo staff: <strong>JSM</strong> / <strong>Demo123!</strong> (security answer: <strong>smith</strong>)
         </p>
         <p class="form-help-text" style="margin-top: 10px;">
-          <a href="forgot-password.html" style="color: var(--brand-green);">Forgot your password?</a>
+          <a href="forgot-password.html" class="text-link">Forgot your password?</a>
         </p>
       </form>
 
@@ -109,12 +109,15 @@
           <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" maxlength="100" required />
         </div>
         <div class="form-group">
-          <label for="signup-password" class="form-label">Password</label>
-          <input type="password" id="signup-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
-          <small class="form-help-text">
-            Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
-          </small>
-        </div>
+  <label for="signup-password" class="form-label">Password</label>
+  <div class="password-input-wrapper">
+    <input type="password" id="signup-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
+    <button type="button" class="password-toggle-btn" data-target="signup-password">👁️</button>
+  </div>
+  <small class="form-help-text">
+    Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
+  </small>
+</div>
         <div class="form-group">
           <label for="signup-security-question" class="form-label">Security Question</label>
           <select id="signup-security-question" class="form-input" required>

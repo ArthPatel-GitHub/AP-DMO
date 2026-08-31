@@ -259,18 +259,15 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   
   // I'm telling the audio to play immediately, but catching the error if the browser blocks autoplay
   currentAudioElement.play().then(() => {
-    // Autoplay worked!
-  }).catch((error) => {
-    // The browser blocked it, so I'll let the user know they need to click play manually
-    if (notificationEngine) {
-      notificationEngine.error('Autoplay blocked by browser. Please press Play.');
-    }
-    const playBtn = playPauseButton;
-    if (playBtn) {
-      playBtn.innerHTML = '▶️ Play';
-      playBtn.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, #4f46e5 100%)';
-    }
-  });
+  // Autoplay worked!
+}).catch((error) => {
+  // The browser blocked it, so I'll let the user know they need to click play manually
+  if (notificationEngine) {
+    notificationEngine.error('Autoplay blocked by browser. Please press Play.');
+  }
+  playPauseButton.innerHTML = '▶️ Play';
+  playPauseButton.classList.add('is-paused');
+});
 
   const playerBox = document.createElement('div');
   playerBox.className = 'player-box';

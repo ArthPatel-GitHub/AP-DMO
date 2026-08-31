@@ -290,20 +290,31 @@ body {
    6. INTERACTIVE ACTIONS & MEDIA BUTTONS
    ========================================== */
 .btn { 
-  background: linear-gradient(135deg, var(--brand-red) 0%, #b91c1c 100%);
+  background: rgba(255, 255, 255, 0.06);
   color: #ffffff; 
-  border: none; 
-  padding: 12px 24px; 
+  border: 1px solid var(--glass-border);
+  padding: 9px 16px; 
   border-radius: 8px; 
   cursor: pointer; 
-  font-weight: 700; 
-  font-size: 0.85rem; 
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
+  font-weight: 600; 
+  font-size: 0.82rem; 
+  letter-spacing: 0.01em;
+  transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.btn:hover { 
+  transform: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  filter: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+  filter: none;
 }
 
 .btn:hover { 
@@ -322,6 +333,28 @@ body {
   cursor: not-allowed;
   transform: none;
   filter: none;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--brand-red) 0%, #b91c1c 100%);
+  border: none;
+}
+
+.btn-danger:hover {
+  filter: brightness(1.1);
+}
+
+.text-link {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.text-link:hover {
+  color: var(--brand-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* --- Player control variants ---
@@ -1243,4 +1276,32 @@ body {
   color: var(--text-muted);
   font-size: 0.8rem;
   letter-spacing: 0.03em;
+}
+/* ==========================================
+   17. PASSWORD VISIBILITY TOGGLE
+   ========================================== */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  line-height: 1;
+}
+
+.password-toggle-btn:hover {
+  color: #ffffff;
 }

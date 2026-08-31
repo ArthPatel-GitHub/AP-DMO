@@ -176,3 +176,20 @@ function clearError() {
     }
   });
 });
+
+// ==========================================
+// PASSWORD VISIBILITY TOGGLE
+// ==========================================
+// Lets users check what they've actually typed before submitting,
+// rather than guessing why a signup was rejected. Works for any
+// number of password fields on the page via data-target.
+document.querySelectorAll('.password-toggle-btn').forEach((toggleBtn) => {
+  toggleBtn.addEventListener('click', () => {
+    const targetInput = document.getElementById(toggleBtn.dataset.target);
+    if (!targetInput) return;
+
+    const isHidden = targetInput.type === 'password';
+    targetInput.type = isHidden ? 'text' : 'password';
+    toggleBtn.textContent = isHidden ? '🙈' : '👁️';
+  });
+});
