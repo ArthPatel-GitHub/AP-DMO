@@ -1178,3 +1178,69 @@ body {
 .player-error-state .player-empty-title {
   color: var(--brand-red);
 }
+/* ==========================================
+   15. AUTH ERROR BANNER (login/signup forms)
+   ========================================== */
+.auth-error-banner {
+  display: none;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.5;
+  animation: errorBannerIn 0.25s ease;
+}
+
+.auth-error-banner.visible {
+  display: flex;
+}
+
+.auth-error-banner-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.auth-error-banner-text {
+  flex: 1;
+}
+
+@keyframes errorBannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ==========================================
+   16. SITE FOOTER
+   ========================================== */
+.app-footer {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 50px auto 0 auto;
+  padding: 16px 24px;
+  text-align: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+}
+
+.app-footer p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}

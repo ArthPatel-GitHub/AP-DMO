@@ -53,14 +53,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showError(message) {
-    errorMessageEl.textContent = message;
-    errorMessageEl.style.display = 'block';
-  }
+  const textEl = document.getElementById('auth-error-text');
+  textEl.textContent = message;
+  errorMessageEl.classList.add('visible');
+}
 
-  function clearError() {
-    errorMessageEl.style.display = 'none';
-    errorMessageEl.textContent = '';
-  }
+function clearError() {
+  errorMessageEl.classList.remove('visible');
+  document.getElementById('auth-error-text').textContent = '';
+}
 
   function switchTab(tab) {
     clearError();

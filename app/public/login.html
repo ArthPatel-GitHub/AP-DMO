@@ -61,6 +61,11 @@
 
       <!-- LOGIN FORM -->
       <form id="login-form" class="request-form">
+      <!-- Inline error message area -->
+      <div id="auth-error-message" class="auth-error-banner">
+      <span class="auth-error-banner-icon">⚠️</span>
+      <span class="auth-error-banner-text" id="auth-error-text"></span>
+    </div>
         <div class="form-group">
           <label for="login-id-email" class="form-label">Student ID, Staff Initials, or Email</label>
           <input type="text" id="login-id-email" class="form-input" placeholder="e.g. 123456 or JSM" maxlength="100" required />
@@ -128,11 +133,6 @@
         </div>
         <button type="submit" class="btn submit-btn">Sign Up</button>
       </form>
-
-      <!-- Inline error message area -->
-      <p id="auth-error-message" style="color: var(--brand-red); font-weight: 600; margin-top: 15px; display: none;"></p>
-
-    </div>
 
     <footer class="app-footer">
       <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>

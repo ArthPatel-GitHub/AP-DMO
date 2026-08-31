@@ -148,10 +148,25 @@ function createSongDatabase(rawSongsArray) {
   }
 
   const validatedSongs = [];
+  const seenIds = new Set();
 
   rawSongsArray.forEach((rawSong, index) => {
     try {
-      validatedSongs.push(createSong(rawSong));
+      const song = createSong(rawSong);
+
+      // A duplicate id would silently overwrite an earlier song
+      // in songCacheMap later on, with no clear warning why one
+      // song "disappeared" from the catalogue - catching it here
+      // instead, at the same validation step as everything else.
+      if (seenIds.has(song.id)) {
+        console.warn(
+          `Skipping song at index ${index}: duplicate id "${song.id}" (already used by an earlier entry).`
+        );
+        return;
+      }
+
+      seenIds.add(song.id);
+      validatedSongs.push(song);
     } catch (error) {
       // Skip the broken entry, but make noise about it so it
       // gets noticed and fixed in the JSON file - we don't want

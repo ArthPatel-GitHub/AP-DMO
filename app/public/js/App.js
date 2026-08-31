@@ -70,8 +70,22 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     })
     .catch(error => {
-      console.error(error);
-      // I'll need a fallback UI just in case the JSON fails to load
+      console.error(error);// The catalogue fetch failed - show a visible message instead
+  // of silently leaving the page blank, same reasoning as the
+  // invalid-song-link handling.
+  const container = document.getElementById('songs-container');
+  if (container) {
+    container.innerHTML = '';
+
+    const errorMessage = document.createElement('p');
+    errorMessage.className = 'text-muted-fallback';
+    errorMessage.textContent = "We couldn't load the song catalogue. Please check your connection and refresh the page.";
+    container.appendChild(errorMessage);
+  }
+
+  if (notificationEngine) {
+    notificationEngine.error('Failed to load songs. Please refresh.');
+  } // I'll need a fallback UI just in case the JSON fails to load
     });
     
   // I added a debounce here so the search doesn't lag if I type too fast
@@ -251,7 +265,7 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
     if (notificationEngine) {
       notificationEngine.error('Autoplay blocked by browser. Please press Play.');
     }
-    const playBtn = document.querySelector('button.btn:nth-child(2)'); 
+    const playBtn = playPauseButton;
     if (playBtn) {
       playBtn.innerHTML = '▶️ Play';
       playBtn.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, #4f46e5 100%)';
