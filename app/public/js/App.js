@@ -261,11 +261,12 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   currentAudioElement.play().then(() => {
   // Autoplay worked!
 }).catch((error) => {
-  // The browser blocked it, so I'll let the user know they need to click play manually
   if (notificationEngine) {
     notificationEngine.error('Autoplay blocked by browser. Please press Play.');
   }
-  playPauseButton.innerHTML = '▶️ Play';
+  playPauseButton.innerHTML = ICON_PLAY;
+  playPauseButton.setAttribute('aria-label', 'Play');
+  playPauseButton.title = 'Play';
   playPauseButton.classList.add('is-paused');
 });
 
@@ -441,9 +442,19 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   buttonRow.style.justifyContent = 'center';
   buttonRow.style.marginBottom = '20px';
 
+// Icon-only SVGs (currentColor so they inherit each button's
+// colour/hover state, unlike emoji which ignore CSS color).
+const ICON_PREV = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+const ICON_NEXT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ICON_DOWNLOAD = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.5l3.5-3.5L17 11.5 12 16.5 7 11.5l1.5-1.5 3.5 3.5V3zM5 19h14v2H5z"/></svg>';
+
 const prevButton = document.createElement('button');
-prevButton.className = 'btn btn-nav';
-prevButton.innerHTML = '⏮️ Previous';
+prevButton.className = 'btn btn-nav btn-icon';
+prevButton.innerHTML = ICON_PREV;
+prevButton.setAttribute('aria-label', 'Previous song');
+prevButton.title = 'Previous';
 if (playbackHistoryStack.length <= 1) {
   prevButton.disabled = true;
 } else {
@@ -452,36 +463,47 @@ if (playbackHistoryStack.length <= 1) {
 
 // I set up my custom play/pause toggle here to control the Audio element
 const playPauseButton = document.createElement('button');
-playPauseButton.className = 'btn btn-play';
-playPauseButton.innerHTML = '⏸️ Pause';
+playPauseButton.className = 'btn btn-play btn-icon';
+playPauseButton.innerHTML = ICON_PAUSE;
+playPauseButton.setAttribute('aria-label', 'Pause');
+playPauseButton.title = 'Pause';
 playPauseButton.addEventListener('click', () => {
   if (currentAudioElement.paused) {
     currentAudioElement.play();
-    playPauseButton.innerHTML = '⏸️ Pause';
+    playPauseButton.innerHTML = ICON_PAUSE;
+    playPauseButton.setAttribute('aria-label', 'Pause');
+    playPauseButton.title = 'Pause';
     playPauseButton.classList.remove('is-paused');
   } else {
     currentAudioElement.pause();
-    playPauseButton.innerHTML = '▶️ Play';
+    playPauseButton.innerHTML = ICON_PLAY;
+    playPauseButton.setAttribute('aria-label', 'Play');
+    playPauseButton.title = 'Play';
     playPauseButton.classList.add('is-paused');
   }
 });
 
 const forwardButton = document.createElement('button');
-forwardButton.className = 'btn btn-nav';
-forwardButton.innerHTML = 'Next ⏭️';
+forwardButton.className = 'btn btn-nav btn-icon';
+forwardButton.innerHTML = ICON_NEXT;
+forwardButton.setAttribute('aria-label', 'Next song');
+forwardButton.title = 'Next';
 forwardButton.addEventListener('click', handleNavigationForward);
 
 const downloadButton = document.createElement('a');
-downloadButton.className = 'btn btn-download';
+downloadButton.className = 'btn btn-download btn-icon';
 downloadButton.href = activeSong.audioUrl;
 downloadButton.download = `${activeSong.title.replace(/\s+/g, '_')}_Practice_Track.mp3`;
-downloadButton.innerHTML = '📥 Download';
+downloadButton.innerHTML = ICON_DOWNLOAD;
+downloadButton.setAttribute('aria-label', 'Download track');
+downloadButton.title = 'Download';
 downloadButton.addEventListener('click', () => {
   if (notificationEngine) notificationEngine.success('Downloading media file...');
 });
 
 const speedController = document.createElement('select');
-speedController.className = 'btn btn-speed-select';
+speedController.className = 'btn btn-speed-select btn-speed-compact';
+speedController.setAttribute('aria-label', 'Playback speed');
 
   
   const speedOptions = [
@@ -512,11 +534,23 @@ speedController.className = 'btn btn-speed-select';
     }
   });
 
-  buttonRow.appendChild(prevButton);
-  buttonRow.appendChild(playPauseButton);
-  buttonRow.appendChild(forwardButton);
-  buttonRow.appendChild(downloadButton);
-  buttonRow.appendChild(speedController);
+  // Group the transport controls (prev/play/next) separately from
+// the utility controls (download/speed), so on smaller screens
+// they can stack as two clean rows instead of wrapping randomly
+// mid-group.
+const primaryControls = document.createElement('div');
+primaryControls.className = 'control-primary-group';
+primaryControls.appendChild(prevButton);
+primaryControls.appendChild(playPauseButton);
+primaryControls.appendChild(forwardButton);
+
+const secondaryControls = document.createElement('div');
+secondaryControls.className = 'control-secondary-group';
+secondaryControls.appendChild(downloadButton);
+secondaryControls.appendChild(speedController);
+
+buttonRow.appendChild(primaryControls);
+buttonRow.appendChild(secondaryControls);
 
   const timelineContainer = document.createElement('div');
   timelineContainer.style.display = 'flex';

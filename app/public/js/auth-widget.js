@@ -88,3 +88,39 @@ window.addEventListener('DOMContentLoaded', () => {
 
   render();
 });
+
+// ==========================================
+// MOBILE HAMBURGER MENU TOGGLE
+// ==========================================
+// Collapses the nav links into a dropdown on small screens,
+// keeping the nav bar itself compact instead of wrapping every
+// link individually across multiple lines.
+window.addEventListener('DOMContentLoaded', () => {
+  const hamburgerBtn = document.getElementById('nav-hamburger');
+  const navLinksWrapper = document.getElementById('nav-links-wrapper');
+  if (!hamburgerBtn || !navLinksWrapper) return; // safety guard
+
+  hamburgerBtn.addEventListener('click', () => {
+    const isOpen = navLinksWrapper.classList.toggle('is-open');
+    hamburgerBtn.classList.toggle('is-open', isOpen);
+    hamburgerBtn.setAttribute('aria-expanded', isOpen);
+  });
+
+  // Close the menu when a link is clicked (navigating away)
+  navLinksWrapper.querySelectorAll('.nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      navLinksWrapper.classList.remove('is-open');
+      hamburgerBtn.classList.remove('is-open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Close the menu when clicking anywhere outside it
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.main-nav')) {
+      navLinksWrapper.classList.remove('is-open');
+      hamburgerBtn.classList.remove('is-open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+});

@@ -10,13 +10,20 @@
 <body>
   <div class="container">
     <nav class="main-nav">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="songs.html" class="nav-link">Catalogue</a>
-      <a href="player.html" class="nav-link">Player</a>
-      <a href="about.html" class="nav-link active">About</a>
-      <a href="contact.html" class="nav-link">Contact</a>
-      <div id="auth-widget"></div>
-    </nav>
+  <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+  <div class="nav-links-wrapper" id="nav-links-wrapper">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="songs.html" class="nav-link">Catalogue</a>
+    <a href="player.html" class="nav-link">Player</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <div id="auth-widget"></div>
+</nav>
 
     <header class="app-branding-container">
       <div class="brand-identity-block">
