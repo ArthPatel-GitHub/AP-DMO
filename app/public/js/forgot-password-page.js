@@ -41,14 +41,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showError(message) {
-    errorMessageEl.textContent = message;
-    errorMessageEl.style.display = 'block';
-  }
+  const textEl = errorMessageEl.querySelector('.auth-error-banner-text');
+  textEl.textContent = message;
+  errorMessageEl.classList.add('visible');
+}
 
-  function clearError() {
-    errorMessageEl.style.display = 'none';
-    errorMessageEl.textContent = '';
-  }
+function clearError() {
+  errorMessageEl.classList.remove('visible');
+  const textEl = errorMessageEl.querySelector('.auth-error-banner-text');
+  textEl.textContent = '';
+}
 
   // ---- Step 1: look up the account's security question ----
   lookupForm.addEventListener('submit', async (event) => {

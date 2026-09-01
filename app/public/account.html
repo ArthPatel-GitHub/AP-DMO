@@ -51,53 +51,74 @@
       <section class="content-block" style="margin-bottom: 30px;">
         <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-green); padding-left: 10px;">Change Email</h2>
         <form id="change-email-form" class="request-form">
+          <div id="email-error" class="auth-error-banner">
+            <span class="auth-error-banner-icon">⚠️</span>
+            <span class="auth-error-banner-text" id="email-error-text"></span>
+          </div>
           <div class="form-group">
             <label for="new-email" class="form-label">New Email Address</label>
             <input type="email" id="new-email" class="form-input" placeholder="your-new-email@example.com" maxlength="100" required />
           </div>
           <button type="submit" class="btn submit-btn">Update Email</button>
         </form>
-        <p id="email-error" style="color: var(--brand-red); font-weight: 600; margin-top: 12px; display: none;"></p>
       </section>
 
       <!-- Change Password -->
       <section class="content-block" style="margin-bottom: 30px;">
         <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-green); padding-left: 10px;">Change Password</h2>
         <form id="change-password-form" class="request-form">
+          <div id="password-error" class="auth-error-banner">
+            <span class="auth-error-banner-icon">⚠️</span>
+            <span class="auth-error-banner-text" id="password-error-text"></span>
+          </div>
           <div class="form-group">
-  <label for="current-password" class="form-label">Current Password</label>
-  <div class="password-input-wrapper">
-    <input type="password" id="current-password" class="form-input" placeholder="Your current password" maxlength="32" required />
-    <button type="button" class="password-toggle-btn" data-target="current-password">👁️</button>
-  </div>
-</div>
+            <label for="current-password" class="form-label">Current Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="current-password" class="form-input" placeholder="Your current password" maxlength="32" required />
+              <button type="button" class="password-toggle-btn" data-target="current-password">
+                <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
           <div class="form-group">
-  <label for="new-password" class="form-label">New Password</label>
-  <div class="password-input-wrapper">
-    <input type="password" id="new-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
-    <button type="button" class="password-toggle-btn" data-target="new-password">👁️</button>
-  </div>
-  <small class="form-help-text">
-    Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
-  </small>
-</div>
+            <label for="new-password" class="form-label">New Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="new-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
+              <button type="button" class="password-toggle-btn" data-target="new-password">
+                <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <small class="form-help-text">
+              Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
+            </small>
+          </div>
           <div class="form-group">
-  <label for="confirm-new-password" class="form-label">Confirm New Password</label>
-  <div class="password-input-wrapper">
-    <input type="password" id="confirm-new-password" class="form-input" placeholder="Re-enter new password" maxlength="32" required />
-    <button type="button" class="password-toggle-btn" data-target="confirm-new-password">👁️</button>
-  </div>
-</div>
+            <label for="confirm-new-password" class="form-label">Confirm New Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="confirm-new-password" class="form-input" placeholder="Re-enter new password" maxlength="32" required />
+              <button type="button" class="password-toggle-btn" data-target="confirm-new-password">
+                <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
           <button type="submit" class="btn submit-btn">Update Password</button>
         </form>
-        <p id="password-error" style="color: var(--brand-red); font-weight: 600; margin-top: 12px; display: none;"></p>
       </section>
 
       <!-- Sign Out -->
       <section class="content-block">
         <h2 style="color: #ffffff; font-size: 1.2rem; font-weight: 800; margin: 0 0 16px 0; border-left: 4px solid var(--brand-red); padding-left: 10px;">Sign Out</h2>
         <p style="color: var(--text-muted); margin-bottom: 16px;">You will be returned to the home page.</p>
-        <button type="button" id="signout-btn" class="btn" style="background: linear-gradient(135deg, var(--brand-red) 0%, #b91c1c 100%);">Sign Out</button>
+        <button type="button" id="signout-btn" class="btn btn-danger">Sign Out</button>
       </section>
 
     </div>

@@ -14,7 +14,16 @@
   --glass-border: rgba(255, 255, 255, 0.05);
   --neon-glow: rgba(16, 185, 129, 0.15);
 }
-
+/* ==========================================
+   GLOBAL BOX-SIZING RESET
+   ========================================== */
+/* Ensures padding and border are included INSIDE any element's
+   declared width, instead of added on top of it. Without this,
+   any element with width:100% + padding renders wider than its
+   container, causing inconsistent sizing across the app. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 body { 
   background-color: var(--bg-main);
   background-image: radial-gradient(circle at 50% 0%, #111827 0%, #030712 70%);
@@ -1291,17 +1300,51 @@ body {
 .password-toggle-btn {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: 8px;
   transform: translateY(-50%);
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.95rem;
-  padding: 4px;
-  line-height: 1;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
 }
 
 .password-toggle-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
   color: #ffffff;
+}
+
+.password-toggle-btn:focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 2px;
+}
+
+.eye-icon {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .form-input,
+  #search-input {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+
+  .password-input-wrapper input {
+    padding-right: 42px;
+  }
+
+  .password-toggle-btn {
+    right: 6px;
+    width: 28px;
+    height: 28px;
+  }
 }

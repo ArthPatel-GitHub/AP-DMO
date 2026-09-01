@@ -61,19 +61,27 @@
 
       <!-- LOGIN FORM -->
       <form id="login-form" class="request-form">
-      <!-- Inline error message area -->
-      <div id="auth-error-message" class="auth-error-banner">
-      <span class="auth-error-banner-icon">⚠️</span>
-      <span class="auth-error-banner-text" id="auth-error-text"></span>
-    </div>
+        <!-- Inline error message area -->
+        <div id="auth-error-message" class="auth-error-banner">
+          <span class="auth-error-banner-icon">⚠️</span>
+          <span class="auth-error-banner-text" id="auth-error-text"></span>
+        </div>
         <div class="form-group">
           <label for="login-id-email" class="form-label">Student ID, Staff Initials, or Email</label>
           <input type="text" id="login-id-email" class="form-input" placeholder="e.g. 123456 or JSM" maxlength="100" required />
         </div>
         <div class="form-group">
-  <label for="login-password" class="form-label">Password</label>
-  <input type="password" id="login-password" class="form-input" placeholder="Your password" maxlength="32" required />
-</div>
+          <label for="login-password" class="form-label">Password</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="login-password" class="form-input" placeholder="Your password" maxlength="32" required />
+            <button type="button" class="password-toggle-btn" data-target="login-password">
+              <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
         <button type="submit" class="btn submit-btn">Log In</button>
         <p class="form-help-text" style="margin-top: 12px;">
           Demo student: <strong>123456</strong> / <strong>Demo123!</strong> (security answer: <strong>rex</strong>) &nbsp;|&nbsp;
@@ -109,15 +117,20 @@
           <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" maxlength="100" required />
         </div>
         <div class="form-group">
-  <label for="signup-password" class="form-label">Password</label>
-  <div class="password-input-wrapper">
-    <input type="password" id="signup-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
-    <button type="button" class="password-toggle-btn" data-target="signup-password">👁️</button>
-  </div>
-  <small class="form-help-text">
-    Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
-  </small>
-</div>
+          <label for="signup-password" class="form-label">Password</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="signup-password" class="form-input" placeholder="8-32 characters" maxlength="32" required />
+            <button type="button" class="password-toggle-btn" data-target="signup-password">
+              <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <small class="form-help-text">
+            Must include an uppercase letter, a lowercase letter, a number, and a special character (e.g. ! @ # $).
+          </small>
+        </div>
         <div class="form-group">
           <label for="signup-security-question" class="form-label">Security Question</label>
           <select id="signup-security-question" class="form-input" required>
@@ -136,6 +149,8 @@
         </div>
         <button type="submit" class="btn submit-btn">Sign Up</button>
       </form>
+
+    </div>
 
     <footer class="app-footer">
       <p>&copy; 2026 Rathkeale College Song Portal. All rights reserved.</p>

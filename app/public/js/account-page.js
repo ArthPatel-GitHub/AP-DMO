@@ -41,15 +41,17 @@ window.addEventListener('DOMContentLoaded', () => {
   accountIdentity.textContent = `${user.fullName} (${user.idOrInitials} · ${user.role}${user.isAdmin ? ' · admin' : ''})`;
 
   // ---- Helper: show/clear field-specific errors ----
-  function showError(el, message) {
-    el.textContent = message;
-    el.style.display = 'block';
-  }
+function showError(bannerEl, message) {
+  const textEl = bannerEl.querySelector('.auth-error-banner-text');
+  textEl.textContent = message;
+  bannerEl.classList.add('visible');
+}
 
-  function clearError(el) {
-    el.textContent = '';
-    el.style.display = 'none';
-  }
+function clearError(bannerEl) {
+  bannerEl.classList.remove('visible');
+  const textEl = bannerEl.querySelector('.auth-error-banner-text');
+  textEl.textContent = '';
+}
 
   // ---- Change Email ----
   changeEmailForm.addEventListener('submit', async (event) => {
