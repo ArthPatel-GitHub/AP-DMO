@@ -15,6 +15,17 @@ let currentAudioElement = null;
 let currentActiveSongId = null;
 let progressUpdateInterval = null;
 
+// Icon-only SVGs (currentColor so they inherit each button's
+// colour/hover state, unlike emoji which ignore CSS color).
+// Declared once here at module level - NOT inside handleStreamSong -
+// since these never change between songs, and re-declaring a
+// const every time a song loads would throw on the second song.
+const ICON_PREV = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+const ICON_NEXT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ICON_DOWNLOAD = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.5l3.5-3.5L17 11.5 12 16.5 7 11.5l1.5-1.5 3.5 3.5V3zM5 19h14v2H5z"/></svg>';
+
 // ==========================================
 // 2. LIFECYCLE INITIALIZATION PIPELINE
 // ==========================================
@@ -64,42 +75,40 @@ window.addEventListener('DOMContentLoaded', () => {
           renderInvalidSongLink(requestedSongId);
         }
       }
-
-      if (notificationEngine && !requestedSongId) {
-        notificationEngine.success('Song database compiled instantly.');
-      }
     })
     .catch(error => {
-      console.error(error);// The catalogue fetch failed - show a visible message instead
-  // of silently leaving the page blank, same reasoning as the
-  // invalid-song-link handling.
-  const container = document.getElementById('songs-container');
-  if (container) {
-    container.innerHTML = '';
+      console.error(error);
 
-    const errorMessage = document.createElement('p');
-    errorMessage.className = 'text-muted-fallback';
-    errorMessage.textContent = "We couldn't load the song catalogue. Please check your connection and refresh the page.";
-    container.appendChild(errorMessage);
-  }
+      // The catalogue fetch failed - show a visible message instead
+      // of silently leaving the page blank, same reasoning as the
+      // invalid-song-link handling.
+      const container = document.getElementById('songs-container');
+      if (container) {
+        container.innerHTML = '';
 
-  if (notificationEngine) {
-    notificationEngine.error('Failed to load songs. Please refresh.');
-  } // I'll need a fallback UI just in case the JSON fails to load
+        const errorMessage = document.createElement('p');
+        errorMessage.className = 'text-muted-fallback';
+        errorMessage.textContent = "We couldn't load the song catalogue. Please check your connection and refresh the page.";
+        container.appendChild(errorMessage);
+      }
+
+      if (notificationEngine) {
+        notificationEngine.error('Failed to load songs. Please refresh.');
+      }
     });
     
   // I added a debounce here so the search doesn't lag if I type too fast
   const searchInput = document.getElementById('search-input');
-if (searchInput) {
-  let debounceTimeoutPointer;
-  searchInput.addEventListener('input', () => {
-    clearTimeout(debounceTimeoutPointer);
-    debounceTimeoutPointer = setTimeout(() => {
-      executeCompoundFiltering();
-      renderSearchSuggestions(searchInput.value); // NEW
-    }, 250);
-  });
-}
+  if (searchInput) {
+    let debounceTimeoutPointer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimeoutPointer);
+      debounceTimeoutPointer = setTimeout(() => {
+        executeCompoundFiltering();
+        renderSearchSuggestions(searchInput.value);
+      }, 250);
+    });
+  }
 
   // If login/logout happens via the nav auth-widget while this
   // page is open, reload so the favourite hearts and the "My
@@ -141,7 +150,7 @@ function renderSongCatalogue(songsArray) {
   if (songsArray.length === 0) {
     const noResultsMessage = document.createElement('p');
     noResultsMessage.className = 'text-muted-fallback'; 
-    noResultsMessage.textContent = 'No songstracks match search query.';
+    noResultsMessage.textContent = 'No songs match your search.';
     container.appendChild(noResultsMessage);
     return;
   }
@@ -164,6 +173,10 @@ function renderSongCatalogue(songsArray) {
     const cardP = document.createElement('p');
     cardP.textContent = song.history;
 
+    const typeBadge = document.createElement('span');
+    typeBadge.className = 'suggestion-meta';
+    typeBadge.textContent = song.type;
+
     // Favourite heart button - only rendered when logged in, since
     // there's nowhere to store a favourite for a guest.
     if (loggedIn) {
@@ -173,6 +186,7 @@ function renderSongCatalogue(songsArray) {
       favouriteButton.classList.toggle('is-favourited', isFav);
       favouriteButton.innerHTML = isFav ? '♥' : '♡';
       favouriteButton.setAttribute('aria-label', isFav ? 'Remove from favourites' : 'Add to favourites');
+      favouriteButton.title = isFav ? 'Remove from favourites' : 'Add to favourites';
       favouriteButton.addEventListener('click', (event) => {
         event.stopPropagation();
         try {
@@ -180,6 +194,7 @@ function renderSongCatalogue(songsArray) {
           favouriteButton.classList.toggle('is-favourited', nowFavourited);
           favouriteButton.innerHTML = nowFavourited ? '♥' : '♡';
           favouriteButton.setAttribute('aria-label', nowFavourited ? 'Remove from favourites' : 'Add to favourites');
+          favouriteButton.title = nowFavourited ? 'Remove from favourites' : 'Add to favourites';
           if (notificationEngine) {
             notificationEngine.success(nowFavourited ? `Added "${song.title}" to favourites` : `Removed "${song.title}" from favourites`);
           }
@@ -208,6 +223,7 @@ function renderSongCatalogue(songsArray) {
     });
 
     cardElement.appendChild(cardTitle);
+    cardElement.appendChild(typeBadge);
     cardElement.appendChild(cardP);
     cardElement.appendChild(loadButton);
     container.appendChild(cardElement);
@@ -254,28 +270,27 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
     notificationEngine.success(`Streaming: ${activeSong.title}`);
   }
 
-  // This is the magic line that actually loads my audio file from the URL I provided in the JSON
-  currentAudioElement = new Audio(activeSong.audioUrl);
-  
-  // I'm telling the audio to play immediately, but catching the error if the browser blocks autoplay
-  currentAudioElement.play().then(() => {
-  // Autoplay worked!
-}).catch((error) => {
-  if (notificationEngine) {
-    notificationEngine.error('Autoplay blocked by browser. Please press Play.');
-  }
-  playPauseButton.innerHTML = ICON_PLAY;
-  playPauseButton.setAttribute('aria-label', 'Play');
-  playPauseButton.title = 'Play';
-  playPauseButton.classList.add('is-paused');
-});
-
   const playerBox = document.createElement('div');
   playerBox.className = 'player-box';
 
+  // "Now playing" indicator + animated equalizer bars (created
+  // here, toggled on/off later once playPauseButton exists).
   const sourceIndicator = document.createElement('div');
   sourceIndicator.className = 'player-source';
-  sourceIndicator.textContent = '📡 CUSTOM MULTIMEDIA STATION ACTIVATED';
+  sourceIndicator.style.display = 'flex';
+  sourceIndicator.style.alignItems = 'center';
+  sourceIndicator.style.justifyContent = 'center';
+
+  const sourceText = document.createElement('span');
+  sourceText.textContent = '📡 CUSTOM MULTIMEDIA STATION ACTIVATED';
+
+  const equalizer = document.createElement('span');
+  equalizer.className = 'equalizer';
+  equalizer.id = 'now-playing-equalizer';
+  equalizer.innerHTML = '<span class="equalizer-bar"></span><span class="equalizer-bar"></span><span class="equalizer-bar"></span><span class="equalizer-bar"></span>';
+
+  sourceIndicator.appendChild(sourceText);
+  sourceIndicator.appendChild(equalizer);
 
   const trackTitle = document.createElement('h2');
   trackTitle.className = 'track-heading';
@@ -430,88 +445,79 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   // CUSTOM MEDIA CONTROLLER DASHBOARD
   // ==========================================
   const controlDashboard = document.createElement('div');
-  controlDashboard.style.background = '#0d1117';
-  controlDashboard.style.borderRadius = '12px';
-  controlDashboard.style.border = '1px solid var(--glass-border)';
-  controlDashboard.style.padding = '20px';
-  controlDashboard.style.margin = '20px 0';
+  controlDashboard.className = 'control-dashboard';
 
   const buttonRow = document.createElement('div');
-  buttonRow.style.display = 'flex';
-  buttonRow.style.gap = '10px';
-  buttonRow.style.justifyContent = 'center';
-  buttonRow.style.marginBottom = '20px';
+  buttonRow.className = 'control-button-row';
 
-// Icon-only SVGs (currentColor so they inherit each button's
-// colour/hover state, unlike emoji which ignore CSS color).
-const ICON_PREV = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
-const ICON_NEXT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>';
-const ICON_PLAY = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-const ICON_DOWNLOAD = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.5l3.5-3.5L17 11.5 12 16.5 7 11.5l1.5-1.5 3.5 3.5V3zM5 19h14v2H5z"/></svg>';
+  // ---- Buttons are created BEFORE the audio element is loaded
+  // and played, since the autoplay-blocked fallback below needs
+  // to reference playPauseButton and the equalizer - referencing
+  // them before they exist would throw a ReferenceError. ----
 
-const prevButton = document.createElement('button');
-prevButton.className = 'btn btn-nav btn-icon';
-prevButton.innerHTML = ICON_PREV;
-prevButton.setAttribute('aria-label', 'Previous song');
-prevButton.title = 'Previous';
-if (playbackHistoryStack.length <= 1) {
-  prevButton.disabled = true;
-} else {
-  prevButton.addEventListener('click', handleNavigationBackwards);
-}
-
-// I set up my custom play/pause toggle here to control the Audio element
-const playPauseButton = document.createElement('button');
-playPauseButton.className = 'btn btn-play btn-icon';
-playPauseButton.innerHTML = ICON_PAUSE;
-playPauseButton.setAttribute('aria-label', 'Pause');
-playPauseButton.title = 'Pause';
-playPauseButton.addEventListener('click', () => {
-  if (currentAudioElement.paused) {
-    currentAudioElement.play();
-    playPauseButton.innerHTML = ICON_PAUSE;
-    playPauseButton.setAttribute('aria-label', 'Pause');
-    playPauseButton.title = 'Pause';
-    playPauseButton.classList.remove('is-paused');
+  const prevButton = document.createElement('button');
+  prevButton.className = 'btn btn-nav btn-icon';
+  prevButton.innerHTML = ICON_PREV;
+  prevButton.setAttribute('aria-label', 'Previous song');
+  prevButton.title = 'Previous';
+  if (playbackHistoryStack.length <= 1) {
+    prevButton.disabled = true;
   } else {
-    currentAudioElement.pause();
-    playPauseButton.innerHTML = ICON_PLAY;
-    playPauseButton.setAttribute('aria-label', 'Play');
-    playPauseButton.title = 'Play';
-    playPauseButton.classList.add('is-paused');
+    prevButton.addEventListener('click', handleNavigationBackwards);
   }
-});
 
-const forwardButton = document.createElement('button');
-forwardButton.className = 'btn btn-nav btn-icon';
-forwardButton.innerHTML = ICON_NEXT;
-forwardButton.setAttribute('aria-label', 'Next song');
-forwardButton.title = 'Next';
-forwardButton.addEventListener('click', handleNavigationForward);
+  // I set up my custom play/pause toggle here to control the Audio element
+  const playPauseButton = document.createElement('button');
+  playPauseButton.className = 'btn btn-play btn-icon';
+  playPauseButton.innerHTML = ICON_PAUSE;
+  playPauseButton.setAttribute('aria-label', 'Pause');
+  playPauseButton.title = 'Pause';
+  playPauseButton.addEventListener('click', () => {
+    if (currentAudioElement.paused) {
+      currentAudioElement.play();
+      playPauseButton.innerHTML = ICON_PAUSE;
+      playPauseButton.setAttribute('aria-label', 'Pause');
+      playPauseButton.title = 'Pause';
+      playPauseButton.classList.remove('is-paused');
+      equalizer.classList.add('is-playing');
+    } else {
+      currentAudioElement.pause();
+      playPauseButton.innerHTML = ICON_PLAY;
+      playPauseButton.setAttribute('aria-label', 'Play');
+      playPauseButton.title = 'Play';
+      playPauseButton.classList.add('is-paused');
+      equalizer.classList.remove('is-playing');
+    }
+  });
 
-const downloadButton = document.createElement('a');
-downloadButton.className = 'btn btn-download btn-icon';
-downloadButton.href = activeSong.audioUrl;
-downloadButton.download = `${activeSong.title.replace(/\s+/g, '_')}_Practice_Track.mp3`;
-downloadButton.innerHTML = ICON_DOWNLOAD;
-downloadButton.setAttribute('aria-label', 'Download track');
-downloadButton.title = 'Download';
-downloadButton.addEventListener('click', () => {
-  if (notificationEngine) notificationEngine.success('Downloading media file...');
-});
+  const forwardButton = document.createElement('button');
+  forwardButton.className = 'btn btn-nav btn-icon';
+  forwardButton.innerHTML = ICON_NEXT;
+  forwardButton.setAttribute('aria-label', 'Next song');
+  forwardButton.title = 'Next';
+  forwardButton.addEventListener('click', handleNavigationForward);
 
-const speedController = document.createElement('select');
-speedController.className = 'btn btn-speed-select btn-speed-compact';
-speedController.setAttribute('aria-label', 'Playback speed');
+  const downloadButton = document.createElement('a');
+  downloadButton.className = 'btn btn-download btn-icon';
+  downloadButton.href = activeSong.audioUrl;
+  downloadButton.download = `${activeSong.title.replace(/\s+/g, '_')}_Practice_Track.mp3`;
+  downloadButton.innerHTML = ICON_DOWNLOAD;
+  downloadButton.setAttribute('aria-label', 'Download track');
+  downloadButton.title = 'Download';
+  downloadButton.addEventListener('click', () => {
+    if (notificationEngine) notificationEngine.success('Downloading media file...');
+  });
 
-  
+  const speedController = document.createElement('select');
+  speedController.className = 'btn btn-speed-select btn-speed-compact';
+  speedController.setAttribute('aria-label', 'Playback speed');
+
   const speedOptions = [
-    { value: 0.5, label: '0.5x (Slow)' },
+    { value: 0.5, label: '0.5x' },
     { value: 0.75, label: '0.75x' },
-    { value: 1.0, label: '1x (Normal)' },
+    { value: 1.0, label: '1x' },
     { value: 1.25, label: '1.25x' },
-    { value: 1.5, label: '1.5x (Fast)' }
+    { value: 1.5, label: '1.5x' }
   ];
 
   speedOptions.forEach(opt => {
@@ -535,32 +541,47 @@ speedController.setAttribute('aria-label', 'Playback speed');
   });
 
   // Group the transport controls (prev/play/next) separately from
-// the utility controls (download/speed), so on smaller screens
-// they can stack as two clean rows instead of wrapping randomly
-// mid-group.
-const primaryControls = document.createElement('div');
-primaryControls.className = 'control-primary-group';
-primaryControls.appendChild(prevButton);
-primaryControls.appendChild(playPauseButton);
-primaryControls.appendChild(forwardButton);
+  // the utility controls (download/speed), so on smaller screens
+  // they can stack as two clean rows instead of wrapping randomly
+  // mid-group.
+  const primaryControls = document.createElement('div');
+  primaryControls.className = 'control-primary-group';
+  primaryControls.appendChild(prevButton);
+  primaryControls.appendChild(playPauseButton);
+  primaryControls.appendChild(forwardButton);
 
-const secondaryControls = document.createElement('div');
-secondaryControls.className = 'control-secondary-group';
-secondaryControls.appendChild(downloadButton);
-secondaryControls.appendChild(speedController);
+  const secondaryControls = document.createElement('div');
+  secondaryControls.className = 'control-secondary-group';
+  secondaryControls.appendChild(downloadButton);
+  secondaryControls.appendChild(speedController);
 
-buttonRow.appendChild(primaryControls);
-buttonRow.appendChild(secondaryControls);
+  buttonRow.appendChild(primaryControls);
+  buttonRow.appendChild(secondaryControls);
+
+  // ---- NOW it's safe to load and play the audio, since
+  // playPauseButton and equalizer both exist above. ----
+  currentAudioElement = new Audio(activeSong.audioUrl);
+
+  currentAudioElement.play().then(() => {
+    // Autoplay worked - start the equalizer animating
+    equalizer.classList.add('is-playing');
+  }).catch((error) => {
+    // The browser blocked it, so let the user know they need to click play manually
+    if (notificationEngine) {
+      notificationEngine.error('Autoplay blocked by browser. Please press Play.');
+    }
+    playPauseButton.innerHTML = ICON_PLAY;
+    playPauseButton.setAttribute('aria-label', 'Play');
+    playPauseButton.title = 'Play';
+    playPauseButton.classList.add('is-paused');
+    equalizer.classList.remove('is-playing');
+  });
 
   const timelineContainer = document.createElement('div');
-  timelineContainer.style.display = 'flex';
-  timelineContainer.style.alignItems = 'center';
-  timelineContainer.style.gap = '12px';
+  timelineContainer.className = 'control-timeline-row';
 
   const currentTimeText = document.createElement('span');
-  currentTimeText.style.fontSize = '0.8rem';
-  currentTimeText.style.color = 'var(--text-muted)';
-  currentTimeText.style.fontFamily = 'monospace';
+  currentTimeText.className = 'timeline-time';
   currentTimeText.textContent = '0:00';
 
   const timelineSlider = document.createElement('input');
@@ -568,14 +589,10 @@ buttonRow.appendChild(secondaryControls);
   timelineSlider.min = '0';
   timelineSlider.max = '100';
   timelineSlider.value = '0';
-  timelineSlider.style.flex = '1';
-  timelineSlider.style.cursor = 'pointer';
-  timelineSlider.style.accentColor = 'var(--brand-green)';
+  timelineSlider.className = 'timeline-slider';
 
   const totalTimeText = document.createElement('span');
-  totalTimeText.style.fontSize = '0.8rem';
-  totalTimeText.style.color = 'var(--text-muted)';
-  totalTimeText.style.fontFamily = 'monospace';
+  totalTimeText.className = 'timeline-time';
   totalTimeText.textContent = '0:00';
 
   // I added an event listener so dragging the slider changes the song position
@@ -658,7 +675,7 @@ function renderInvalidSongLink(requestedSongId) {
 
   const backBtn = document.createElement('a');
   backBtn.className = 'player-empty-btn';
-  backBtn.href = 'home.html'; // update this if your catalogue page has a different filename
+  backBtn.href = 'songs.html';
   backBtn.textContent = '← Back to Song Catalogue';
 
   errorBox.appendChild(icon);
@@ -801,6 +818,7 @@ function executeCompoundFiltering() {
 
   renderSongCatalogue(filteredSongs);
 }
+
 // ==========================================
 // 9. LIVE SEARCH SUGGESTIONS
 // ==========================================

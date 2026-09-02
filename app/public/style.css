@@ -1674,3 +1674,34 @@ body {
     margin-top: 0;
   }
 }
+/* ==========================================
+   20. ANIMATED NOW-PLAYING EQUALIZER
+   ========================================== */
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+  margin-left: 8px;
+}
+
+.equalizer-bar {
+  width: 3px;
+  background: var(--brand-green);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.equalizer.is-playing .equalizer-bar {
+  animation: equalizerBounce 0.9s ease-in-out infinite;
+}
+
+.equalizer-bar:nth-child(1) { animation-delay: 0s; }
+.equalizer-bar:nth-child(2) { animation-delay: 0.2s; }
+.equalizer-bar:nth-child(3) { animation-delay: 0.4s; }
+.equalizer-bar:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes equalizerBounce {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
