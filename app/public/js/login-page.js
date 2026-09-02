@@ -15,11 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const loggedInPanel = document.getElementById('logged-in-panel');
   const authFormsPanel = document.getElementById('auth-forms-panel');
   const welcomeMessage = document.getElementById('welcome-message');
-  const logoutReason = sessionStorage.getItem('logout_reason');
-if (logoutReason && notyf) {
-  notyf.error(logoutReason);
-  sessionStorage.removeItem('logout_reason');
-}
+  const logoutBtn = document.getElementById('logout-btn');
 
   const tabLogin = document.getElementById('tab-login');
   const tabSignup = document.getElementById('tab-signup');
@@ -38,9 +34,21 @@ if (logoutReason && notyf) {
     securityQuestionSelect.appendChild(option);
   });
 
+  // notyf MUST be declared before anything below tries to use it -
+  // referencing a const before its declaration line throws a
+  // ReferenceError that silently stops the rest of this callback
+  // from running, which previously prevented the login form's
+  // submit listener from ever being attached.
   const notyf = typeof Notyf !== 'undefined'
     ? new Notyf({ duration: 2500, position: { x: 'right', y: 'bottom' }, ripple: false })
     : null;
+
+  // Show a toast if auto-logout.js redirected here with a reason
+  const logoutReason = sessionStorage.getItem('logout_reason');
+  if (logoutReason && notyf) {
+    notyf.error(logoutReason);
+    sessionStorage.removeItem('logout_reason');
+  }
 
   // ---- UI state helpers ----
 
@@ -57,15 +65,15 @@ if (logoutReason && notyf) {
   }
 
   function showError(message) {
-  const textEl = document.getElementById('auth-error-text');
-  textEl.textContent = message;
-  errorMessageEl.classList.add('visible');
-}
+    const textEl = document.getElementById('auth-error-text');
+    textEl.textContent = message;
+    errorMessageEl.classList.add('visible');
+  }
 
-function clearError() {
-  errorMessageEl.classList.remove('visible');
-  document.getElementById('auth-error-text').textContent = '';
-}
+  function clearError() {
+    errorMessageEl.classList.remove('visible');
+    document.getElementById('auth-error-text').textContent = '';
+  }
 
   function switchTab(tab) {
     clearError();
@@ -109,13 +117,15 @@ function clearError() {
   });
 
   // ---- Logout ----
-  logoutBtn.addEventListener('click', () => {
-    account.logOut();
-    if (notyf) notyf.success('Logged out.');
-    showFormsState();
-    loginForm.reset();
-    window.dispatchEvent(new CustomEvent('auth-state-changed'));
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      account.logOut();
+      if (notyf) notyf.success('Logged out.');
+      showFormsState();
+      loginForm.reset();
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+    });
+  }
 
   // If login/logout happens via the nav auth-widget while this
   // page is open, keep this page's own panel in sync too.
@@ -179,21 +189,23 @@ function clearError() {
       }
     }
   });
-});
 
-// ==========================================
-// PASSWORD VISIBILITY TOGGLE
-// ==========================================
-// Lets users check what they've actually typed before submitting,
-// rather than guessing why a signup was rejected. Works for any
-// number of password fields on the page via data-target.
-document.querySelectorAll('.password-toggle-btn').forEach((toggleBtn) => {
-  toggleBtn.addEventListener('click', () => {
-    const targetInput = document.getElementById(toggleBtn.dataset.target);
-    if (!targetInput) return;
+  // ---- Password visibility toggle ----
+  // Kept inside this same DOMContentLoaded block (buttons only
+  // exist on this page once the DOM is ready), but wrapped in its
+  // own try/catch-free simple loop so it stays isolated and easy
+  // to reason about separately from the auth logic above.
+  const EYE_OPEN_ICON = '<svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_CLOSED_ICON = '<svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
-    const isHidden = targetInput.type === 'password';
-    targetInput.type = isHidden ? 'text' : 'password';
-    toggleBtn.textContent = isHidden ? '🙈' : '👁️';
+  document.querySelectorAll('.password-toggle-btn').forEach((toggleBtn) => {
+    toggleBtn.addEventListener('click', () => {
+      const targetInput = document.getElementById(toggleBtn.dataset.target);
+      if (!targetInput) return;
+
+      const isHidden = targetInput.type === 'password';
+      targetInput.type = isHidden ? 'text' : 'password';
+      toggleBtn.innerHTML = isHidden ? EYE_CLOSED_ICON : EYE_OPEN_ICON;
+    });
   });
 });

@@ -1730,3 +1730,54 @@ body {
     transform: scale(1) rotate(0deg);
   }
 }
+/* ==========================================
+   22. AUTO-LOGOUT WARNING BANNER
+   ========================================== */
+.inactivity-warning {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 320px;
+  background: #111827;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  z-index: 99999;
+  animation: inactivityWarningIn 0.3s ease;
+}
+
+.inactivity-warning-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-amber);
+  font-weight: 800;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.inactivity-warning-text {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.inactivity-warning-countdown {
+  font-family: monospace;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.inactivity-warning-btn {
+  width: 100%;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
+  border: none;
+}
+
+@keyframes inactivityWarningIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
