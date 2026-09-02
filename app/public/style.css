@@ -39,9 +39,30 @@ body {
 
 .container {
   max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
+/* Large desktop monitors: let the container grow wider so
+   content actually fills more of the available screen instead
+   of leaving large empty gutters on very wide displays. */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1500px;
+  }
+}
+@media (min-width: 1400px) {
+  #songs-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
 /* ==========================================
    2. REWORKED INLINE HEADER ZONE
    ========================================== */
@@ -509,9 +530,6 @@ body {
    7. LOWER CATALOGUE GRID
    ========================================== */
 
-/* ==========================================
-   7. LOWER CATALOGUE GRID
-   ========================================== */
 .column-title { 
   font-size: 1.4rem; 
   margin-top: 0; 
