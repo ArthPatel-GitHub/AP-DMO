@@ -15,7 +15,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   const loggedInPanel = document.getElementById('logged-in-panel');
   const authFormsPanel = document.getElementById('auth-forms-panel');
   const welcomeMessage = document.getElementById('welcome-message');
-  const logoutBtn = document.getElementById('logout-btn');
+  const logoutReason = sessionStorage.getItem('logout_reason');
+if (logoutReason && notyf) {
+  notyf.error(logoutReason);
+  sessionStorage.removeItem('logout_reason');
+}
 
   const tabLogin = document.getElementById('tab-login');
   const tabSignup = document.getElementById('tab-signup');
