@@ -62,13 +62,16 @@ window.addEventListener('DOMContentLoaded', () => {
       dropdown.classList.toggle('hidden');
     });
 
-    signOutBtn.addEventListener('click', () => {
-      account.logOut();
-      render(); // re-render this widget back to the logged-out state
-      // Notify the rest of the page, in case it cares (e.g.
-      // contact-page.js needs to know to show the full form again).
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
-    });
+  signOutBtn.addEventListener('click', () => {
+  const confirmed = window.confirm('Are you sure you want to sign out?');
+  if (!confirmed) return;
+
+  account.logOut();
+  render(); // re-render this widget back to the logged-out state
+  // Notify the rest of the page, in case it cares (e.g.
+  // contact-page.js needs to know to show the full form again).
+  window.dispatchEvent(new CustomEvent('auth-state-changed'));
+});
 
     // Clicking anywhere outside the dropdown closes it.
     document.addEventListener('click', (event) => {

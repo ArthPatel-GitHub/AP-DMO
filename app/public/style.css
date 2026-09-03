@@ -396,14 +396,15 @@ body {
   border-color: transparent;
 }
 
-.btn-play {
-  /* Playing state: green, matches brand accent */
-  background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
+.btn-play,
+.btn-play.is-paused {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border: 1px solid var(--glass-border);
 }
 
-.btn-play.is-paused {
-  /* Paused state: blue/indigo, signals "press to resume" */
-  background: linear-gradient(135deg, var(--accent-blue) 0%, #4f46e5 100%);
+.btn-play:hover {
+  background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
+  border-color: transparent;
 }
 
 .btn-download {
@@ -500,14 +501,39 @@ body {
 }
 
 .btn-speed-compact {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: auto;
-  padding: 0 12px;
+  min-width: 42px;
   height: 42px;
+  padding: 0 16px;
+  padding-bottom: 2px;
+  margin: 0;
+  line-height: normal;
   border-radius: 21px;
   font-size: 0.75rem;
-  text-transform: none;
-  letter-spacing: 0;
-  flex-shrink: 0;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+  text-align-last: center;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border: 1px solid var(--glass-border);
+  color: #ffffff;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.btn-speed-compact:hover {
+  background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
+  border-color: transparent;
+}
+
+.btn-speed-compact::-ms-expand {
+  display: none; /* removes old Edge/IE's native dropdown arrow, if relevant */
 }
 
 @media (max-width: 480px) {
@@ -521,16 +547,19 @@ body {
     height: 14px;
   }
 
+  @media (max-width: 480px) {
   .btn-speed-compact {
     height: 36px;
-    font-size: 0.7rem;
     padding: 0 10px;
+    padding-bottom: 2px;
+    font-size: 0.7rem;
   }
+  }
+}
 
   .control-button-row {
     gap: 6px;
   }
-}
 
 /* ==========================================
    7. LOWER CATALOGUE GRID
@@ -1150,6 +1179,13 @@ body {
 .notyf__icon--error {
   height: 16px;
   width: 16px;
+}
+/* Small coloured accent bar matching the toggle-active button
+   colour, so toast confirmations for playback-mode toggles look
+   visually connected to the buttons that triggered them, rather
+   than looking identical to every other unrelated toast. */
+.notyf__toast.notyf-mode-toast {
+  border-left: 3px solid var(--brand-green);
 }
 
 /* ==========================================
@@ -1786,4 +1822,16 @@ body {
 @keyframes inactivityWarningIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+/* ==========================================
+   23. CHARACTER COUNTER STATUS COLOURS
+   ========================================== */
+.char-count-warning {
+  color: var(--accent-amber) !important;
+  font-weight: 700;
+}
+
+.char-count-limit {
+  color: var(--brand-red) !important;
+  font-weight: 700;
 }

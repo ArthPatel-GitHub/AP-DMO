@@ -101,10 +101,13 @@ function clearError(bannerEl) {
 
   // ---- Sign Out ----
   signoutBtn.addEventListener('click', () => {
-    account.logOut();
-    window.dispatchEvent(new CustomEvent('auth-state-changed'));
-    window.location.href = 'index.html';
-  });
+  const confirmed = window.confirm('Are you sure you want to sign out?');
+  if (!confirmed) return;
+
+  account.logOut();
+  window.dispatchEvent(new CustomEvent('auth-state-changed'));
+  window.location.href = 'index.html';
+});
 
   // If sign-out happens via the nav widget while on this page,
   // flip to the guest state immediately.

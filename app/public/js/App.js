@@ -60,6 +60,14 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Show a loading message immediately, before the fetch even
+// starts, so the user gets feedback that something is happening
+// rather than staring at a blank page while database.json loads.
+const catalogueContainer = document.getElementById('songs-container');
+if (catalogueContainer) {
+  catalogueContainer.innerHTML = '<p class="text-muted-fallback">⏳ Loading songs...</p>';
+}
+
   // Show a welcome toast if login-page.js left us a message
   // (only happens on the redirect from a successful login).
   const welcomeMessage = sessionStorage.getItem('welcome_message');
@@ -530,7 +538,13 @@ shuffleButton.addEventListener('click', () => {
   shuffleButton.classList.toggle('toggle-active', isShuffleOn);
   shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
   shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
-  if (notificationEngine) notificationEngine.success(isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+
+  if (notificationEngine) {
+  notificationEngine.success({
+    message: isShuffleOn ? 'Shuffle on' : 'Shuffle off',
+    className: 'notyf-mode-toast'
+  });
+}
 });
 
 const repeatButton = document.createElement('button');
@@ -558,7 +572,13 @@ repeatButton.addEventListener('click', () => {
   repeatMode = nextMode;
   updateRepeatButtonUI();
   const modeLabel = repeatMode === 'off' ? 'Off' : repeatMode === 'one' ? 'One song' : 'All songs';
-  if (notificationEngine) notificationEngine.success(`Repeat: ${modeLabel}`);
+
+  if (notificationEngine) {
+  notificationEngine.success({
+    message: `Repeat: ${modeLabel}`,
+    className: 'notyf-mode-toast'
+  });
+}
 });
 
   const downloadButton = document.createElement('a');

@@ -84,14 +84,26 @@ window.addEventListener('DOMContentLoaded', () => {
   // Live character counter for the message box, which has a
   // 250-char maxlength on the <textarea> itself - this just gives
   // a visible readout so the limit isn't a silent surprise.
-  const messageTextarea = document.getElementById('request-message');
-  const charCountEl = document.getElementById('message-char-count');
-  if (messageTextarea && charCountEl) {
-    const maxLength = messageTextarea.getAttribute('maxlength') || 250;
-    const updateCount = () => {
-      charCountEl.textContent = `${messageTextarea.value.length} / ${maxLength} characters`;
-    };
-    messageTextarea.addEventListener('input', updateCount);
-    updateCount(); // set the initial 0 / 250 state
-  }
+ const messageTextarea = document.getElementById('request-message');
+const charCountEl = document.getElementById('message-char-count');
+if (messageTextarea && charCountEl) {
+  const maxLength = messageTextarea.getAttribute('maxlength') || 250;
+  const updateCount = () => {
+    const currentLength = messageTextarea.value.length;
+    charCountEl.textContent = `${currentLength} / ${maxLength} characters`;
+
+    // Give the user an early visual warning as they approach the
+    // limit, rather than letting them find out only once typing
+    // silently stops working at maxlength.
+    charCountEl.classList.remove('char-count-warning', 'char-count-limit');
+    const percentUsed = currentLength / maxLength;
+    if (percentUsed >= 1) {
+      charCountEl.classList.add('char-count-limit');
+    } else if (percentUsed >= 0.85) {
+      charCountEl.classList.add('char-count-warning');
+    }
+  };
+  messageTextarea.addEventListener('input', updateCount);
+  updateCount(); // set the initial 0 / 250 state
+}
 });
