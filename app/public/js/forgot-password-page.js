@@ -44,6 +44,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const textEl = errorMessageEl.querySelector('.auth-error-banner-text');
   textEl.textContent = message;
   errorMessageEl.classList.add('visible');
+  errorMessageEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function clearError() {

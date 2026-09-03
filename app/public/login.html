@@ -11,41 +11,41 @@
 <body>
   <div class="container">
     <nav class="main-nav">
-  <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
-  <div class="nav-links-wrapper" id="nav-links-wrapper">
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="songs.html" class="nav-link">Catalogue</a>
-    <a href="player.html" class="nav-link">Player</a>
-    <a href="about.html" class="nav-link">About</a>
-    <a href="contact.html" class="nav-link">Contact</a>
-  </div>
-  <div id="auth-widget"></div>
-</nav>
+      <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      <div class="nav-links-wrapper" id="nav-links-wrapper">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="songs.html" class="nav-link">Catalogue</a>
+        <a href="player.html" class="nav-link">Player</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </div>
+      <div id="auth-widget"></div>
+    </nav>
 
     <header class="app-branding-container">
-    <div class="brand-identity-block brand-identity-with-mark">
-  <svg class="brand-mark" viewBox="0 0 40 40" width="36" height="36" fill="none">
-    <path d="M20 2 L36 8 V20 C36 30 29 36 20 38 C11 36 4 30 4 20 V8 Z" 
-          fill="url(#brandGradient)" stroke="var(--brand-green)" stroke-width="1.5"/>
-    <path d="M16 26 V14 L26 12 V24" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <circle cx="14" cy="27" r="3" fill="#ffffff"/>
-    <circle cx="24" cy="25" r="3" fill="#ffffff"/>
-    <defs>
-      <linearGradient id="brandGradient" x1="0" y1="0" x2="40" y2="40">
-        <stop offset="0%" stop-color="#111827"/>
-        <stop offset="100%" stop-color="#030712"/>
-      </linearGradient>
-    </defs>
-  </svg>
-  <div>
-    <h1>Rathkeale College</h1>
-    <p>Song & Tradition Portal</p>
-  </div>
-</div>
+      <div class="brand-identity-block brand-identity-with-mark">
+        <svg class="brand-mark" viewBox="0 0 40 40" width="36" height="36" fill="none">
+          <path d="M20 2 L36 8 V20 C36 30 29 36 20 38 C11 36 4 30 4 20 V8 Z" 
+                fill="url(#brandGradient)" stroke="var(--brand-green)" stroke-width="1.5"/>
+          <path d="M16 26 V14 L26 12 V24" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="14" cy="27" r="3" fill="#ffffff"/>
+          <circle cx="24" cy="25" r="3" fill="#ffffff"/>
+          <defs>
+            <linearGradient id="brandGradient" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#111827"/>
+              <stop offset="100%" stop-color="#030712"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <h1>Rathkeale College</h1>
+          <p>Song & Tradition Portal</p>
+        </div>
+      </div>
     </header>
 
     <!-- Scope notice: this is a local browser-only demo, not a real shared account system -->
@@ -81,13 +81,19 @@
         </div>
       </div>
 
+      <!-- Inline error message area - lives OUTSIDE both forms so it
+           stays visible regardless of which tab is active. Previously
+           this sat inside #login-form, which meant switching to the
+           Sign Up tab (which hides #login-form via display:none) also
+           hid the error banner along with it, even though showError()
+           was correctly firing and adding the .visible class. -->
+      <div id="auth-error-message" class="auth-error-banner">
+        <span class="auth-error-banner-icon">⚠️</span>
+        <span class="auth-error-banner-text" id="auth-error-text"></span>
+      </div>
+
       <!-- LOGIN FORM -->
       <form id="login-form" class="request-form">
-        <!-- Inline error message area -->
-        <div id="auth-error-message" class="auth-error-banner">
-          <span class="auth-error-banner-icon">⚠️</span>
-          <span class="auth-error-banner-text" id="auth-error-text"></span>
-        </div>
         <div class="form-group">
           <label for="login-id-email" class="form-label">Student ID, Staff Initials, or Email</label>
           <input type="text" id="login-id-email" class="form-input" placeholder="e.g. 123456 or JSM" maxlength="100" required />

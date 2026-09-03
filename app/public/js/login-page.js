@@ -64,11 +64,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     authFormsPanel.style.display = 'block';
   }
 
-  function showError(message) {
-    const textEl = document.getElementById('auth-error-text');
-    textEl.textContent = message;
-    errorMessageEl.classList.add('visible');
-  }
+ function showError(message) {
+  const textEl = document.getElementById('auth-error-text');
+  textEl.textContent = message;
+  errorMessageEl.classList.add('visible');
+  errorMessageEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
   function clearError() {
     errorMessageEl.classList.remove('visible');
