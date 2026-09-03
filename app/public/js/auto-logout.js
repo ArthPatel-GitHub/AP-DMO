@@ -12,8 +12,8 @@
 // computer after walking away.
 
 (function () {
-const INACTIVITY_LIMIT_MS = 15 * 1000; // 15 seconds for testing
-const COUNTDOWN_SECONDS = 10;
+const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 minutes
+const COUNTDOWN_SECONDS = 60; // 60 second warning countdown
 
   let inactivityTimer = null;
   let countdownInterval = null;
