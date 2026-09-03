@@ -15,6 +15,24 @@ let currentAudioElement = null;
 let currentActiveSongId = null;
 let progressUpdateInterval = null;
 
+let repeatMode = 'off'; // one of REPEAT_MODES from types.js
+let isShuffleOn = false;
+let shuffleQueue = [];
+
+// Fisher-Yates shuffle - builds a fresh randomised "bag" of every
+// song except the one currently playing, so shuffle mode plays
+// through the whole catalogue once before any repeats happen,
+// rather than picking a random song every time (which could
+// repeat the same song back-to-back).
+function buildShuffleQueue() {
+  const ids = songsDatabase.map(song => song.id).filter(id => id !== currentActiveSongId);
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  return ids;
+}
+
 // Icon-only SVGs (currentColor so they inherit each button's
 // colour/hover state, unlike emoji which ignore CSS color).
 // Declared once here at module level - NOT inside handleStreamSong -
@@ -25,6 +43,9 @@ const ICON_NEXT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="current
 const ICON_PLAY = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
 const ICON_DOWNLOAD = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.5l3.5-3.5L17 11.5 12 16.5 7 11.5l1.5-1.5 3.5 3.5V3zM5 19h14v2H5z"/></svg>';
+const ICON_SHUFFLE = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>';
+const ICON_REPEAT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+const ICON_REPEAT_ONE = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/><text x="10" y="15" font-size="8" fill="currentColor" stroke="none">1</text></svg>';
 
 // ==========================================
 // 2. LIFECYCLE INITIALIZATION PIPELINE
@@ -497,6 +518,49 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   forwardButton.title = 'Next';
   forwardButton.addEventListener('click', handleNavigationForward);
 
+  const shuffleButton = document.createElement('button');
+shuffleButton.className = 'btn btn-nav btn-icon';
+shuffleButton.innerHTML = ICON_SHUFFLE;
+if (isShuffleOn) shuffleButton.classList.add('toggle-active');
+shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
+shuffleButton.addEventListener('click', () => {
+  isShuffleOn = !isShuffleOn;
+  shuffleQueue = []; // rebuilt fresh next time Next is pressed
+  shuffleButton.classList.toggle('toggle-active', isShuffleOn);
+  shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+  shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
+  if (notificationEngine) notificationEngine.success(isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+});
+
+const repeatButton = document.createElement('button');
+repeatButton.className = 'btn btn-nav btn-icon';
+const REPEAT_CYCLE = window.REPEAT_MODES; // ['off', 'one', 'all'] from types.js
+
+function updateRepeatButtonUI() {
+  repeatButton.classList.toggle('toggle-active', repeatMode !== 'off');
+  repeatButton.innerHTML = repeatMode === 'one' ? ICON_REPEAT_ONE : ICON_REPEAT;
+  const label = repeatMode === 'off' ? 'Repeat off' : repeatMode === 'one' ? 'Repeat one song' : 'Repeat all songs';
+  repeatButton.setAttribute('aria-label', label);
+  repeatButton.title = label;
+}
+updateRepeatButtonUI();
+
+repeatButton.addEventListener('click', () => {
+  const currentIndex = REPEAT_CYCLE.indexOf(repeatMode);
+  const nextMode = REPEAT_CYCLE[(currentIndex + 1) % REPEAT_CYCLE.length];
+
+  // Validates the new mode against the type defined in types.js
+  // before applying it - defensive, but keeps this in sync with
+  // the same rule used everywhere else in the app.
+  if (!window.isValidRepeatMode(nextMode)) return;
+
+  repeatMode = nextMode;
+  updateRepeatButtonUI();
+  const modeLabel = repeatMode === 'off' ? 'Off' : repeatMode === 'one' ? 'One song' : 'All songs';
+  if (notificationEngine) notificationEngine.success(`Repeat: ${modeLabel}`);
+});
+
   const downloadButton = document.createElement('a');
   downloadButton.className = 'btn btn-download btn-icon';
   downloadButton.href = activeSong.audioUrl;
@@ -546,9 +610,11 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   // mid-group.
   const primaryControls = document.createElement('div');
   primaryControls.className = 'control-primary-group';
+  primaryControls.appendChild(shuffleButton);
   primaryControls.appendChild(prevButton);
   primaryControls.appendChild(playPauseButton);
   primaryControls.appendChild(forwardButton);
+  primaryControls.appendChild(repeatButton);
 
   const secondaryControls = document.createElement('div');
   secondaryControls.className = 'control-secondary-group';
@@ -708,11 +774,33 @@ function handleNavigationBackwards() {
 function handleNavigationForward() {
   if (songsDatabase.length === 0) return;
 
+  // Repeat-one takes priority over everything else - just replay
+  // the current song rather than advancing at all.
+  if (repeatMode === 'one' && currentActiveSongId) {
+    handleStreamSong(currentActiveSongId, false);
+    return;
+  }
+
+  if (isShuffleOn) {
+    if (shuffleQueue.length === 0) {
+      shuffleQueue = buildShuffleQueue();
+    }
+    const nextSongId = shuffleQueue.shift();
+    if (nextSongId) handleStreamSong(nextSongId, true);
+    return;
+  }
+
   const currentDatabaseIndex = songsDatabase.findIndex(song => song.id === currentActiveSongId);
   let nextDatabaseIndex = currentDatabaseIndex + 1;
-  
+
   if (nextDatabaseIndex >= songsDatabase.length) {
-    nextDatabaseIndex = 0; 
+    if (repeatMode !== 'all') {
+      // Reached the end and repeat-all isn't on - stop here
+      // instead of silently looping forever.
+      if (notificationEngine) notificationEngine.success('Reached the end of the catalogue.');
+      return;
+    }
+    nextDatabaseIndex = 0;
   }
 
   const nextSongTarget = songsDatabase[nextDatabaseIndex];

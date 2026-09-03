@@ -493,6 +493,12 @@ body {
   flex-shrink: 0;
 }
 
+.btn-icon.toggle-active {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--brand-green);
+  color: var(--brand-green);
+}
+
 .btn-speed-compact {
   width: auto;
   padding: 0 12px;
