@@ -18,6 +18,7 @@ let progressUpdateInterval = null;
 let repeatMode = 'off'; // one of REPEAT_MODES from types.js
 let isShuffleOn = false;
 let shuffleQueue = [];
+let currentPlaybackSpeed = 1.0; // persists across song changes, resets only on full page reload
 
 // Fisher-Yates shuffle - builds a fresh randomised "bag" of every
 // song except the one currently playing, so shuffle mode plays
@@ -258,28 +259,41 @@ function renderSongCatalogue(songsArray) {
       favouriteButton.setAttribute('aria-label', isFav ? 'Remove from favourites' : 'Add to favourites');
       favouriteButton.title = isFav ? 'Remove from favourites' : 'Add to favourites';
       favouriteButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        try {
-          const nowFavourited = account.toggleFavourite(song.id);
-          favouriteButton.classList.toggle('is-favourited', nowFavourited);
-          favouriteButton.innerHTML = nowFavourited ? '♥' : '♡';
-          favouriteButton.setAttribute('aria-label', nowFavourited ? 'Remove from favourites' : 'Add to favourites');
-          favouriteButton.title = nowFavourited ? 'Remove from favourites' : 'Add to favourites';
-          if (notificationEngine) {
-            notificationEngine.success(nowFavourited ? `Added "${song.title}" to favourites` : `Removed "${song.title}" from favourites`);
-          }
-          // If the "My Favourites" filter is currently active and
-          // a song just got un-favourited, it should disappear
-          // from the visible list immediately rather than waiting
-          // for the next unrelated re-render.
-          if (activeFavouritesFilter && !nowFavourited) {
-            executeCompoundFiltering();
-          }
-        } catch (error) {
-          if (notificationEngine) notificationEngine.error('Could not update favourites.');
-          console.error(error);
-        }
-      });
+  event.stopPropagation();
+
+  // Briefly disable the button for the duration of the toggle -
+  // prevents a rapid double-click from firing toggleFavourite()
+  // twice in quick succession, which could flip the favourite
+  // state back and forth faster than the UI/toast can keep up
+  // with, or cause the toast messages to overlap confusingly.
+  if (favouriteButton.disabled) return;
+  favouriteButton.disabled = true;
+
+  try {
+    const nowFavourited = account.toggleFavourite(song.id);
+    favouriteButton.classList.toggle('is-favourited', nowFavourited);
+    favouriteButton.innerHTML = nowFavourited ? '♥' : '♡';
+    favouriteButton.setAttribute('aria-label', nowFavourited ? 'Remove from favourites' : 'Add to favourites');
+    favouriteButton.title = nowFavourited ? 'Remove from favourites' : 'Add to favourites';
+    if (notificationEngine) {
+      notificationEngine.success(nowFavourited ? `Added "${song.title}" to favourites` : `Removed "${song.title}" from favourites`);
+    }
+    if (activeFavouritesFilter && !nowFavourited) {
+      executeCompoundFiltering();
+    }
+  } catch (error) {
+    if (notificationEngine) notificationEngine.error('Could not update favourites.');
+    console.error(error);
+  } finally {
+    // Re-enable shortly after, rather than leaving it permanently
+    // disabled - this is just a brief lock to prevent double-fire,
+    // not a genuine loading state (toggleFavourite is synchronous
+    // and instant, so there's nothing to actually wait on).
+    setTimeout(() => {
+      favouriteButton.disabled = false;
+    }, 300);
+  }
+});
       cardElement.appendChild(favouriteButton);
     }
 
@@ -633,37 +647,41 @@ repeatButton.addEventListener('click', () => {
     if (notificationEngine) notificationEngine.success('Downloading media file...');
   });
 
-  const speedController = document.createElement('select');
-  speedController.className = 'btn btn-speed-select btn-speed-compact';
-  speedController.setAttribute('aria-label', 'Playback speed');
+const speedController = document.createElement('select');
+speedController.className = 'btn btn-speed-select btn-speed-compact';
+speedController.setAttribute('aria-label', 'Playback speed');
 
-  const speedOptions = [
-    { value: 0.5, label: '0.5x' },
-    { value: 0.75, label: '0.75x' },
-    { value: 1.0, label: '1x' },
-    { value: 1.25, label: '1.25x' },
-    { value: 1.5, label: '1.5x' }
-  ];
+const speedOptions = [
+  { value: 0.5, label: '0.5x' },
+  { value: 0.75, label: '0.75x' },
+  { value: 1.0, label: '1x' },
+  { value: 1.25, label: '1.25x' },
+  { value: 1.5, label: '1.5x' }
+];
 
-  speedOptions.forEach(opt => {
-    const optionElement = document.createElement('option');
-    optionElement.value = opt.value;
-    optionElement.textContent = opt.label;
-    optionElement.style.background = '#111827'; 
-    optionElement.style.color = '#ffffff';
-    if (opt.value === 1.0) optionElement.selected = true;
-    speedController.appendChild(optionElement);
-  });
+speedOptions.forEach(opt => {
+  const optionElement = document.createElement('option');
+  optionElement.value = opt.value;
+  optionElement.textContent = opt.label;
+  optionElement.style.background = '#111827'; 
+  optionElement.style.color = '#ffffff';
+  // Selects whichever option matches the persisted speed, not
+  // always defaulting back to 1x - this is what keeps the
+  // dropdown showing the correct value across song changes.
+  if (opt.value === currentPlaybackSpeed) optionElement.selected = true;
+  speedController.appendChild(optionElement);
+});
 
-  speedController.addEventListener('change', (event) => {
-    if (currentAudioElement) {
-      const newSpeed = parseFloat(event.target.value);
-      currentAudioElement.playbackRate = newSpeed;
-      if (notificationEngine) {
-        notificationEngine.success(`Playback speed set to ${newSpeed}x`);
-      }
+speedController.addEventListener('change', (event) => {
+  const newSpeed = parseFloat(event.target.value);
+  currentPlaybackSpeed = newSpeed; // persists for the next song too
+  if (currentAudioElement) {
+    currentAudioElement.playbackRate = newSpeed;
+    if (notificationEngine) {
+      notificationEngine.success(`Playback speed set to ${newSpeed}x`);
     }
-  });
+  }
+});
 
   // Group the transport controls (prev/play/next) separately from
   // the utility controls (download/speed), so on smaller screens
@@ -688,6 +706,7 @@ repeatButton.addEventListener('click', () => {
   // ---- NOW it's safe to load and play the audio, since
   // playPauseButton and equalizer both exist above. ----
   currentAudioElement = new Audio(activeSong.audioUrl);
+  currentAudioElement.playbackRate = currentPlaybackSpeed; // carry the chosen speed over to the new song
 
   currentAudioElement.play().then(() => {
     // Autoplay worked - start the equalizer animating

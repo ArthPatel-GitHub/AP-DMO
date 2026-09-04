@@ -1229,6 +1229,12 @@ body {
   margin-top: 10px;
 }
 
+.favourite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 /* ==========================================
    14. PLAYER ERROR STATE (invalid / tampered link)
    ========================================== */
