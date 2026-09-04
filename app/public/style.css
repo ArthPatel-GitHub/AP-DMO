@@ -1835,3 +1835,38 @@ body {
   color: var(--brand-red) !important;
   font-weight: 700;
 }
+/* ==========================================
+   26. EMPTY SEARCH RESULTS STATE
+   ========================================== */
+.search-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 2px dashed var(--glass-border);
+}
+
+.search-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.search-empty-title {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+}
+
+.search-empty-text {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.search-empty-clear-btn {
+  background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
+  border: none;
+}

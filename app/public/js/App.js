@@ -177,10 +177,51 @@ function renderSongCatalogue(songsArray) {
   container.innerHTML = '';
 
   if (songsArray.length === 0) {
-    const noResultsMessage = document.createElement('p');
-    noResultsMessage.className = 'text-muted-fallback'; 
-    noResultsMessage.textContent = 'No songs match your search.';
-    container.appendChild(noResultsMessage);
+    const emptyState = document.createElement('div');
+    emptyState.className = 'search-empty-state';
+
+    const icon = document.createElement('div');
+    icon.className = 'search-empty-icon';
+    icon.textContent = '🔍';
+
+    const title = document.createElement('h3');
+    title.className = 'search-empty-title';
+    title.textContent = 'No songs found';
+
+    const text = document.createElement('p');
+    text.className = 'search-empty-text';
+    text.textContent = "We couldn't find any songs matching your search or filters. Try a different search term, or clear your filters to see the full catalogue.";
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'btn search-empty-clear-btn';
+    clearBtn.textContent = 'Clear Search & Filters';
+    clearBtn.addEventListener('click', () => {
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) searchInput.value = '';
+
+      activeTypeFilter = 'all';
+      activeLengthFilter = 'all';
+      activeFavouritesFilter = false;
+
+      // Reset the visible filter button states back to "All"
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      const allTypeBtn = document.getElementById('filter-all-type');
+      const allLenBtn = document.getElementById('filter-all-len');
+      if (allTypeBtn) allTypeBtn.classList.add('active');
+      if (allLenBtn) allLenBtn.classList.add('active');
+
+      const dropdown = document.getElementById('suggestions-dropdown');
+      if (dropdown) dropdown.classList.add('hidden');
+
+      renderSongCatalogue(songsDatabase);
+    });
+
+    emptyState.appendChild(icon);
+    emptyState.appendChild(title);
+    emptyState.appendChild(text);
+    emptyState.appendChild(clearBtn);
+    container.appendChild(emptyState);
     return;
   }
 
