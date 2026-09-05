@@ -635,6 +635,41 @@ body {
   padding: 40px;
 }
 
+.card.is-now-playing {
+  border-color: var(--brand-green);
+  box-shadow: 0 0 0 1px var(--brand-green), 0 10px 15px -3px rgba(0,0,0,0.3);
+}
+
+.now-playing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--brand-green);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.now-playing-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-green);
+  animation: nowPlayingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes nowPlayingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 /* ==========================================
    9. LYRICS LEARNING MODULE
    ========================================== */
@@ -1875,4 +1910,10 @@ body {
 .search-empty-clear-btn {
   background: linear-gradient(135deg, var(--brand-green) 0%, #059669 100%);
   border: none;
+}
+/* ==========================================
+   28. EMPTY FAVOURITES STATE
+   ========================================== */
+.favourites-empty-icon {
+  color: var(--brand-red);
 }

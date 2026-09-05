@@ -4,15 +4,13 @@
 // 1. GLOBAL CORE ENVIRONMENT VARIABLES
 // ==========================================
 
-// I'm setting up my main variables here to keep track of the songs and the audio player state.
 let songsDatabase = []; 
 let notificationEngine;
 let playbackHistoryStack = [];
 const songCacheMap = new Map();
 
-// This holds the actual HTML5 Audio object that plays my mp3s
 let currentAudioElement = null; 
-let currentActiveSongId = null;
+let currentActiveSongId = sessionStorage.getItem('current_playing_song_id') || null;
 let progressUpdateInterval = null;
 
 let repeatMode = 'off'; // one of REPEAT_MODES from types.js
@@ -22,9 +20,7 @@ let currentPlaybackSpeed = 1.0; // persists across song changes, resets only on 
 
 // Fisher-Yates shuffle - builds a fresh randomised "bag" of every
 // song except the one currently playing, so shuffle mode plays
-// through the whole catalogue once before any repeats happen,
-// rather than picking a random song every time (which could
-// repeat the same song back-to-back).
+// through the whole catalogue once before any repeats happen.
 function buildShuffleQueue() {
   const ids = songsDatabase.map(song => song.id).filter(id => id !== currentActiveSongId);
   for (let i = ids.length - 1; i > 0; i--) {
@@ -61,23 +57,17 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Show a loading message immediately, before the fetch even
-// starts, so the user gets feedback that something is happening
-// rather than staring at a blank page while database.json loads.
-const catalogueContainer = document.getElementById('songs-container');
-if (catalogueContainer) {
-  catalogueContainer.innerHTML = '<p class="text-muted-fallback">⏳ Loading songs...</p>';
-}
+  const catalogueContainer = document.getElementById('songs-container');
+  if (catalogueContainer) {
+    catalogueContainer.innerHTML = '<p class="text-muted-fallback">⏳ Loading songs...</p>';
+  }
 
-  // Show a welcome toast if login-page.js left us a message
-  // (only happens on the redirect from a successful login).
   const welcomeMessage = sessionStorage.getItem('welcome_message');
   if (welcomeMessage && notificationEngine) {
     notificationEngine.success(welcomeMessage);
     sessionStorage.removeItem('welcome_message');
   }
 
-  // Fetching my JSON file so I have all my song data ready to go
   fetch('/database.json')
     .then(response => {
       if (!response.ok) throw new Error('Network pipeline response was not operational');
@@ -90,15 +80,10 @@ if (catalogueContainer) {
       renderSongCatalogue(songsDatabase);
       runCalendarSelection();
       
-      // I wrote this to check if I'm on the player page so it auto-loads the correct song
       const urlParams = new URLSearchParams(window.location.search);
       const requestedSongId = urlParams.get('song');
       
       if (requestedSongId && document.getElementById('player-container')) {
-        // Validate the id from the URL BEFORE trying to stream it -
-        // a user can freely edit ?song= in the address bar to
-        // anything (a typo, an old id, pure garbage), so this can't
-        // be trusted the same way an internal function call can.
         if (songCacheMap.has(requestedSongId)) {
           handleStreamSong(requestedSongId, true);
         } else {
@@ -109,13 +94,9 @@ if (catalogueContainer) {
     .catch(error => {
       console.error(error);
 
-      // The catalogue fetch failed - show a visible message instead
-      // of silently leaving the page blank, same reasoning as the
-      // invalid-song-link handling.
       const container = document.getElementById('songs-container');
       if (container) {
         container.innerHTML = '';
-
         const errorMessage = document.createElement('p');
         errorMessage.className = 'text-muted-fallback';
         errorMessage.textContent = "We couldn't load the song catalogue. Please check your connection and refresh the page.";
@@ -127,7 +108,6 @@ if (catalogueContainer) {
       }
     });
     
-  // I added a debounce here so the search doesn't lag if I type too fast
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     let debounceTimeoutPointer;
@@ -140,10 +120,6 @@ if (catalogueContainer) {
     });
   }
 
-  // If login/logout happens via the nav auth-widget while this
-  // page is open, reload so the favourite hearts and the "My
-  // Favourites" filter button correctly reflect the new state -
-  // same pattern used on contact.html and login.html.
   if (document.getElementById('songs-container')) {
     window.addEventListener('auth-state-changed', () => {
       window.location.reload();
@@ -178,25 +154,36 @@ function renderSongCatalogue(songsArray) {
   container.innerHTML = '';
 
   if (songsArray.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'search-empty-state';
+  const emptyState = document.createElement('div');
+  emptyState.className = 'search-empty-state';
 
-    const icon = document.createElement('div');
-    icon.className = 'search-empty-icon';
+  const icon = document.createElement('div');
+  icon.className = 'search-empty-icon';
+
+  const title = document.createElement('h3');
+  title.className = 'search-empty-title';
+
+  const text = document.createElement('p');
+  text.className = 'search-empty-text';
+
+  // Tailor the empty state specifically for "My Favourites with
+  // zero saved songs" rather than showing the same generic
+  // "no search results" message for a completely different reason.
+  if (activeFavouritesFilter) {
+    icon.classList.add('favourites-empty-icon');
+    icon.textContent = '♡';
+    title.textContent = 'No favourites yet';
+    text.textContent = "You haven't favourited any songs yet. Tap the heart icon on any song card to save it here for quick access later.";
+  } else {
     icon.textContent = '🔍';
-
-    const title = document.createElement('h3');
-    title.className = 'search-empty-title';
     title.textContent = 'No songs found';
-
-    const text = document.createElement('p');
-    text.className = 'search-empty-text';
     text.textContent = "We couldn't find any songs matching your search or filters. Try a different search term, or clear your filters to see the full catalogue.";
+  }
 
-    const clearBtn = document.createElement('button');
-    clearBtn.type = 'button';
-    clearBtn.className = 'btn search-empty-clear-btn';
-    clearBtn.textContent = 'Clear Search & Filters';
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'btn search-empty-clear-btn';
+  clearBtn.textContent = activeFavouritesFilter ? 'Clear Filters' : 'Clear Search & Filters';
     clearBtn.addEventListener('click', () => {
       const searchInput = document.getElementById('search-input');
       if (searchInput) searchInput.value = '';
@@ -205,7 +192,6 @@ function renderSongCatalogue(songsArray) {
       activeLengthFilter = 'all';
       activeFavouritesFilter = false;
 
-      // Reset the visible filter button states back to "All"
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       const allTypeBtn = document.getElementById('filter-all-type');
       const allLenBtn = document.getElementById('filter-all-len');
@@ -226,17 +212,20 @@ function renderSongCatalogue(songsArray) {
     return;
   }
 
-  // Logged-in state is checked once per render, not per card -
-  // cheaper than asking on every single card, and the catalogue
-  // re-renders on every filter/search change anyway, which keeps
-  // this in sync naturally.
   const account = new UserAccount();
   const loggedIn = account.isLoggedIn();
 
-  // Looping through my database to create the song cards dynamically
   songsArray.forEach(song => {
     const cardElement = document.createElement('div');
     cardElement.className = 'card';
+
+    // Highlight the card matching whatever song is currently loaded
+    // in the player, so returning to the catalogue shows at a glance
+    // what's currently playing rather than giving no indication at all.
+    const isCurrentlyPlaying = song.id === currentActiveSongId;
+    if (isCurrentlyPlaying) {
+      cardElement.classList.add('is-now-playing');
+    }
 
     const cardTitle = document.createElement('h3');
     cardTitle.textContent = song.title;
@@ -248,8 +237,6 @@ function renderSongCatalogue(songsArray) {
     typeBadge.className = 'suggestion-meta';
     typeBadge.textContent = song.type;
 
-    // Favourite heart button - only rendered when logged in, since
-    // there's nowhere to store a favourite for a guest.
     if (loggedIn) {
       const favouriteButton = document.createElement('button');
       favouriteButton.className = 'favourite-btn';
@@ -259,41 +246,35 @@ function renderSongCatalogue(songsArray) {
       favouriteButton.setAttribute('aria-label', isFav ? 'Remove from favourites' : 'Add to favourites');
       favouriteButton.title = isFav ? 'Remove from favourites' : 'Add to favourites';
       favouriteButton.addEventListener('click', (event) => {
-  event.stopPropagation();
+        event.stopPropagation();
 
-  // Briefly disable the button for the duration of the toggle -
-  // prevents a rapid double-click from firing toggleFavourite()
-  // twice in quick succession, which could flip the favourite
-  // state back and forth faster than the UI/toast can keep up
-  // with, or cause the toast messages to overlap confusingly.
-  if (favouriteButton.disabled) return;
-  favouriteButton.disabled = true;
+        // Briefly disable the button for the duration of the toggle -
+        // prevents a rapid double-click from firing toggleFavourite()
+        // twice in quick succession.
+        if (favouriteButton.disabled) return;
+        favouriteButton.disabled = true;
 
-  try {
-    const nowFavourited = account.toggleFavourite(song.id);
-    favouriteButton.classList.toggle('is-favourited', nowFavourited);
-    favouriteButton.innerHTML = nowFavourited ? '♥' : '♡';
-    favouriteButton.setAttribute('aria-label', nowFavourited ? 'Remove from favourites' : 'Add to favourites');
-    favouriteButton.title = nowFavourited ? 'Remove from favourites' : 'Add to favourites';
-    if (notificationEngine) {
-      notificationEngine.success(nowFavourited ? `Added "${song.title}" to favourites` : `Removed "${song.title}" from favourites`);
-    }
-    if (activeFavouritesFilter && !nowFavourited) {
-      executeCompoundFiltering();
-    }
-  } catch (error) {
-    if (notificationEngine) notificationEngine.error('Could not update favourites.');
-    console.error(error);
-  } finally {
-    // Re-enable shortly after, rather than leaving it permanently
-    // disabled - this is just a brief lock to prevent double-fire,
-    // not a genuine loading state (toggleFavourite is synchronous
-    // and instant, so there's nothing to actually wait on).
-    setTimeout(() => {
-      favouriteButton.disabled = false;
-    }, 300);
-  }
-});
+        try {
+          const nowFavourited = account.toggleFavourite(song.id);
+          favouriteButton.classList.toggle('is-favourited', nowFavourited);
+          favouriteButton.innerHTML = nowFavourited ? '♥' : '♡';
+          favouriteButton.setAttribute('aria-label', nowFavourited ? 'Remove from favourites' : 'Add to favourites');
+          favouriteButton.title = nowFavourited ? 'Remove from favourites' : 'Add to favourites';
+          if (notificationEngine) {
+            notificationEngine.success(nowFavourited ? `Added "${song.title}" to favourites` : `Removed "${song.title}" from favourites`);
+          }
+          if (activeFavouritesFilter && !nowFavourited) {
+            executeCompoundFiltering();
+          }
+        } catch (error) {
+          if (notificationEngine) notificationEngine.error('Could not update favourites.');
+          console.error(error);
+        } finally {
+          setTimeout(() => {
+            favouriteButton.disabled = false;
+          }, 300);
+        }
+      });
       cardElement.appendChild(favouriteButton);
     }
 
@@ -301,10 +282,16 @@ function renderSongCatalogue(songsArray) {
     loadButton.className = 'btn';
     loadButton.textContent = '▶️ Play';
     
-    // Clicking this sends the user to the player page with the song ID in the URL
     loadButton.addEventListener('click', () => {
       window.location.href = `player.html?song=${song.id}`;
     });
+
+    if (isCurrentlyPlaying) {
+      const nowPlayingBadge = document.createElement('span');
+      nowPlayingBadge.className = 'now-playing-badge';
+      nowPlayingBadge.textContent = 'Now Playing';
+      cardElement.appendChild(nowPlayingBadge);
+    }
 
     cardElement.appendChild(cardTitle);
     cardElement.appendChild(typeBadge);
@@ -323,19 +310,15 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
 
   const activeSong = songCacheMap.get(songId);
   if (!activeSong) {
-    // Guards against a stale/tampered id reaching this point via
-    // any path (e.g. a corrupted history stack from previous()/
-    // next()), not just the initial URL check - one single place
-    // this function can never silently do nothing.
     renderInvalidSongLink(songId);
     return;
   }
 
   currentActiveSongId = songId;
+  sessionStorage.setItem('current_playing_song_id', songId); // persists across full page navigations
 
   safelyPurgeActiveIntervals();
   
-  // I have to make sure any currently playing song stops before I load a new one
   if (currentAudioElement) {
     currentAudioElement.pause();
     currentAudioElement = null;
@@ -357,8 +340,6 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   const playerBox = document.createElement('div');
   playerBox.className = 'player-box';
 
-  // "Now playing" indicator + animated equalizer bars (created
-  // here, toggled on/off later once playPauseButton exists).
   const sourceIndicator = document.createElement('div');
   sourceIndicator.className = 'player-source';
   sourceIndicator.style.display = 'flex';
@@ -534,11 +515,6 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   const buttonRow = document.createElement('div');
   buttonRow.className = 'control-button-row';
 
-  // ---- Buttons are created BEFORE the audio element is loaded
-  // and played, since the autoplay-blocked fallback below needs
-  // to reference playPauseButton and the equalizer - referencing
-  // them before they exist would throw a ReferenceError. ----
-
   const prevButton = document.createElement('button');
   prevButton.className = 'btn btn-nav btn-icon';
   prevButton.innerHTML = ICON_PREV;
@@ -550,7 +526,6 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
     prevButton.addEventListener('click', handleNavigationBackwards);
   }
 
-  // I set up my custom play/pause toggle here to control the Audio element
   const playPauseButton = document.createElement('button');
   playPauseButton.className = 'btn btn-play btn-icon';
   playPauseButton.innerHTML = ICON_PAUSE;
@@ -581,60 +556,71 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   forwardButton.title = 'Next';
   forwardButton.addEventListener('click', handleNavigationForward);
 
+  // ---- Shuffle button ----
+  // Disabled outright (not just blocked on click) whenever the
+  // catalogue has fewer than 2 songs, so the user can see at a
+  // glance that shuffle isn't available right now, rather than
+  // discovering it only after clicking.
   const shuffleButton = document.createElement('button');
-shuffleButton.className = 'btn btn-nav btn-icon';
-shuffleButton.innerHTML = ICON_SHUFFLE;
-if (isShuffleOn) shuffleButton.classList.add('toggle-active');
-shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
-shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
-shuffleButton.addEventListener('click', () => {
-  isShuffleOn = !isShuffleOn;
-  shuffleQueue = []; // rebuilt fresh next time Next is pressed
-  shuffleButton.classList.toggle('toggle-active', isShuffleOn);
-  shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
-  shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
+  shuffleButton.className = 'btn btn-nav btn-icon';
+  shuffleButton.innerHTML = ICON_SHUFFLE;
 
-  if (notificationEngine) {
-  notificationEngine.success({
-    message: isShuffleOn ? 'Shuffle on' : 'Shuffle off',
-    className: 'notyf-mode-toast'
-  });
-}
-});
+  const shuffleUnavailable = songsDatabase.length <= 1;
 
-const repeatButton = document.createElement('button');
-repeatButton.className = 'btn btn-nav btn-icon';
-const REPEAT_CYCLE = window.REPEAT_MODES; // ['off', 'one', 'all'] from types.js
+  if (shuffleUnavailable) {
+    shuffleButton.disabled = true;
+    shuffleButton.setAttribute('aria-label', 'Shuffle unavailable - only one song in the catalogue');
+    shuffleButton.title = 'Shuffle needs at least 2 songs in the catalogue';
+  } else {
+    if (isShuffleOn) shuffleButton.classList.add('toggle-active');
+    shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+    shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
+    shuffleButton.addEventListener('click', () => {
+      isShuffleOn = !isShuffleOn;
+      shuffleQueue = [];
+      shuffleButton.classList.toggle('toggle-active', isShuffleOn);
+      shuffleButton.setAttribute('aria-label', isShuffleOn ? 'Shuffle on' : 'Shuffle off');
+      shuffleButton.title = isShuffleOn ? 'Shuffle on' : 'Shuffle off';
 
-function updateRepeatButtonUI() {
-  repeatButton.classList.toggle('toggle-active', repeatMode !== 'off');
-  repeatButton.innerHTML = repeatMode === 'one' ? ICON_REPEAT_ONE : ICON_REPEAT;
-  const label = repeatMode === 'off' ? 'Repeat off' : repeatMode === 'one' ? 'Repeat one song' : 'Repeat all songs';
-  repeatButton.setAttribute('aria-label', label);
-  repeatButton.title = label;
-}
-updateRepeatButtonUI();
+      if (notificationEngine) {
+        notificationEngine.success({
+          message: isShuffleOn ? 'Shuffle on' : 'Shuffle off',
+          className: 'notyf-mode-toast'
+        });
+      }
+    });
+  }
 
-repeatButton.addEventListener('click', () => {
-  const currentIndex = REPEAT_CYCLE.indexOf(repeatMode);
-  const nextMode = REPEAT_CYCLE[(currentIndex + 1) % REPEAT_CYCLE.length];
+  const repeatButton = document.createElement('button');
+  repeatButton.className = 'btn btn-nav btn-icon';
+  const REPEAT_CYCLE = window.REPEAT_MODES;
 
-  // Validates the new mode against the type defined in types.js
-  // before applying it - defensive, but keeps this in sync with
-  // the same rule used everywhere else in the app.
-  if (!window.isValidRepeatMode(nextMode)) return;
-
-  repeatMode = nextMode;
+  function updateRepeatButtonUI() {
+    repeatButton.classList.toggle('toggle-active', repeatMode !== 'off');
+    repeatButton.innerHTML = repeatMode === 'one' ? ICON_REPEAT_ONE : ICON_REPEAT;
+    const label = repeatMode === 'off' ? 'Repeat off' : repeatMode === 'one' ? 'Repeat one song' : 'Repeat all songs';
+    repeatButton.setAttribute('aria-label', label);
+    repeatButton.title = label;
+  }
   updateRepeatButtonUI();
-  const modeLabel = repeatMode === 'off' ? 'Off' : repeatMode === 'one' ? 'One song' : 'All songs';
 
-  if (notificationEngine) {
-  notificationEngine.success({
-    message: `Repeat: ${modeLabel}`,
-    className: 'notyf-mode-toast'
+  repeatButton.addEventListener('click', () => {
+    const currentIndex = REPEAT_CYCLE.indexOf(repeatMode);
+    const nextMode = REPEAT_CYCLE[(currentIndex + 1) % REPEAT_CYCLE.length];
+
+    if (!window.isValidRepeatMode(nextMode)) return;
+
+    repeatMode = nextMode;
+    updateRepeatButtonUI();
+    const modeLabel = repeatMode === 'off' ? 'Off' : repeatMode === 'one' ? 'One song' : 'All songs';
+
+    if (notificationEngine) {
+      notificationEngine.success({
+        message: `Repeat: ${modeLabel}`,
+        className: 'notyf-mode-toast'
+      });
+    }
   });
-}
-});
 
   const downloadButton = document.createElement('a');
   downloadButton.className = 'btn btn-download btn-icon';
@@ -647,46 +633,39 @@ repeatButton.addEventListener('click', () => {
     if (notificationEngine) notificationEngine.success('Downloading media file...');
   });
 
-const speedController = document.createElement('select');
-speedController.className = 'btn btn-speed-select btn-speed-compact';
-speedController.setAttribute('aria-label', 'Playback speed');
+  const speedController = document.createElement('select');
+  speedController.className = 'btn btn-speed-select btn-speed-compact';
+  speedController.setAttribute('aria-label', 'Playback speed');
 
-const speedOptions = [
-  { value: 0.5, label: '0.5x' },
-  { value: 0.75, label: '0.75x' },
-  { value: 1.0, label: '1x' },
-  { value: 1.25, label: '1.25x' },
-  { value: 1.5, label: '1.5x' }
-];
+  const speedOptions = [
+    { value: 0.5, label: '0.5x' },
+    { value: 0.75, label: '0.75x' },
+    { value: 1.0, label: '1x' },
+    { value: 1.25, label: '1.25x' },
+    { value: 1.5, label: '1.5x' }
+  ];
 
-speedOptions.forEach(opt => {
-  const optionElement = document.createElement('option');
-  optionElement.value = opt.value;
-  optionElement.textContent = opt.label;
-  optionElement.style.background = '#111827'; 
-  optionElement.style.color = '#ffffff';
-  // Selects whichever option matches the persisted speed, not
-  // always defaulting back to 1x - this is what keeps the
-  // dropdown showing the correct value across song changes.
-  if (opt.value === currentPlaybackSpeed) optionElement.selected = true;
-  speedController.appendChild(optionElement);
-});
+  speedOptions.forEach(opt => {
+    const optionElement = document.createElement('option');
+    optionElement.value = opt.value;
+    optionElement.textContent = opt.label;
+    optionElement.style.background = '#111827'; 
+    optionElement.style.color = '#ffffff';
+    if (opt.value === currentPlaybackSpeed) optionElement.selected = true;
+    speedController.appendChild(optionElement);
+  });
 
-speedController.addEventListener('change', (event) => {
-  const newSpeed = parseFloat(event.target.value);
-  currentPlaybackSpeed = newSpeed; // persists for the next song too
-  if (currentAudioElement) {
-    currentAudioElement.playbackRate = newSpeed;
-    if (notificationEngine) {
-      notificationEngine.success(`Playback speed set to ${newSpeed}x`);
+  speedController.addEventListener('change', (event) => {
+    const newSpeed = parseFloat(event.target.value);
+    currentPlaybackSpeed = newSpeed;
+    if (currentAudioElement) {
+      currentAudioElement.playbackRate = newSpeed;
+      if (notificationEngine) {
+        notificationEngine.success(`Playback speed set to ${newSpeed}x`);
+      }
     }
-  }
-});
+  });
 
-  // Group the transport controls (prev/play/next) separately from
-  // the utility controls (download/speed), so on smaller screens
-  // they can stack as two clean rows instead of wrapping randomly
-  // mid-group.
   const primaryControls = document.createElement('div');
   primaryControls.className = 'control-primary-group';
   primaryControls.appendChild(shuffleButton);
@@ -703,16 +682,12 @@ speedController.addEventListener('change', (event) => {
   buttonRow.appendChild(primaryControls);
   buttonRow.appendChild(secondaryControls);
 
-  // ---- NOW it's safe to load and play the audio, since
-  // playPauseButton and equalizer both exist above. ----
   currentAudioElement = new Audio(activeSong.audioUrl);
-  currentAudioElement.playbackRate = currentPlaybackSpeed; // carry the chosen speed over to the new song
+  currentAudioElement.playbackRate = currentPlaybackSpeed;
 
   currentAudioElement.play().then(() => {
-    // Autoplay worked - start the equalizer animating
     equalizer.classList.add('is-playing');
   }).catch((error) => {
-    // The browser blocked it, so let the user know they need to click play manually
     if (notificationEngine) {
       notificationEngine.error('Autoplay blocked by browser. Please press Play.');
     }
@@ -741,7 +716,6 @@ speedController.addEventListener('change', (event) => {
   totalTimeText.className = 'timeline-time';
   totalTimeText.textContent = '0:00';
 
-  // I added an event listener so dragging the slider changes the song position
   timelineSlider.addEventListener('input', () => {
     if (!currentAudioElement.duration) return;
     currentAudioElement.currentTime = (timelineSlider.value / 100) * currentAudioElement.duration;
@@ -761,7 +735,6 @@ speedController.addEventListener('change', (event) => {
 
   playerContainer.appendChild(playerBox);
 
-  // This interval updates my progress bar math visually every quarter of a second
   progressUpdateInterval = setInterval(() => {
     if (!currentAudioElement || !currentAudioElement.duration) return;
     
@@ -776,7 +749,6 @@ speedController.addEventListener('change', (event) => {
     totalTimeText.textContent = `${totalMin}:${totalSec}`;
   }, 250);
 
-  // I put this here so the next song plays automatically when one finishes
   currentAudioElement.addEventListener('ended', () => {
     safelyPurgeActiveIntervals();
     handleNavigationForward();
@@ -786,12 +758,6 @@ speedController.addEventListener('change', (event) => {
 // ==========================================
 // 5b. BROKEN / TAMPERED LINK HANDLING
 // ==========================================
-// If someone edits the ?song= URL param to an id that doesn't
-// exist in the database (typo, old link, deleted song, or just
-// pasted garbage), this renders a clear error state instead of
-// leaving player-container blank with no explanation. Used both
-// on initial page load and as a safety net inside
-// handleStreamSong itself.
 function renderInvalidSongLink(requestedSongId) {
   const playerContainer = document.getElementById('player-container');
   if (!playerContainer) return;
@@ -854,8 +820,6 @@ function handleNavigationBackwards() {
 function handleNavigationForward() {
   if (songsDatabase.length === 0) return;
 
-  // Repeat-one takes priority over everything else - just replay
-  // the current song rather than advancing at all.
   if (repeatMode === 'one' && currentActiveSongId) {
     handleStreamSong(currentActiveSongId, false);
     return;
@@ -866,7 +830,11 @@ function handleNavigationForward() {
       shuffleQueue = buildShuffleQueue();
     }
     const nextSongId = shuffleQueue.shift();
-    if (nextSongId) handleStreamSong(nextSongId, true);
+    if (nextSongId) {
+      handleStreamSong(nextSongId, true);
+    } else if (notificationEngine) {
+      notificationEngine.error('No other songs available to shuffle to.');
+    }
     return;
   }
 
@@ -875,8 +843,6 @@ function handleNavigationForward() {
 
   if (nextDatabaseIndex >= songsDatabase.length) {
     if (repeatMode !== 'all') {
-      // Reached the end and repeat-all isn't on - stop here
-      // instead of silently looping forever.
       if (notificationEngine) notificationEngine.success('Reached the end of the catalogue.');
       return;
     }
@@ -904,7 +870,7 @@ function safelyPurgeActiveIntervals() {
 
 let activeTypeFilter = 'all'; 
 let activeLengthFilter = 'all'; 
-let activeFavouritesFilter = false; // true = "My Favourites" filter is on
+let activeFavouritesFilter = false;
 
 const filterBindings = [
   { id: 'filter-all-type', type: 'type', value: 'all' },
@@ -930,10 +896,6 @@ filterBindings.forEach(binding => {
   }
 });
 
-// Render the favourites filter group based on login state.
-// Logged in: show the "♥ My Favourites" toggle button.
-// Logged out: show a polite prompt to log in instead of a
-// dead label with nothing next to it.
 const favouritesFilterGroup = document.getElementById('favourites-filter-group');
 if (favouritesFilterGroup) {
   const favAccount = new UserAccount();
@@ -990,15 +952,9 @@ function executeCompoundFiltering() {
 // ==========================================
 // 9. LIVE SEARCH SUGGESTIONS
 // ==========================================
-// Builds a dropdown of matching songs as the user types, so they
-// can jump straight to a song without submitting the full search
-// or scrolling the catalogue. Reuses the same debounced input
-// listener already wired up for executeCompoundFiltering, rather
-// than adding a second listener on the same input.
-
 function renderSearchSuggestions(searchString) {
   const dropdown = document.getElementById('suggestions-dropdown');
-  if (!dropdown) return; // safety guard - not every page has this element
+  if (!dropdown) return;
 
   dropdown.innerHTML = '';
 
@@ -1016,7 +972,6 @@ function renderSearchSuggestions(searchString) {
     return;
   }
 
-  // Cap at 6 results so the dropdown never overwhelms the screen
   matches.slice(0, 6).forEach(song => {
     const item = document.createElement('div');
     item.className = 'suggestion-item';
@@ -1042,8 +997,6 @@ function renderSearchSuggestions(searchString) {
   dropdown.classList.remove('hidden');
 }
 
-// Close the dropdown when clicking anywhere outside it - same
-// pattern already used for the auth widget's dropdown.
 document.addEventListener('click', (event) => {
   const dropdown = document.getElementById('suggestions-dropdown');
   const searchInput = document.getElementById('search-input');
