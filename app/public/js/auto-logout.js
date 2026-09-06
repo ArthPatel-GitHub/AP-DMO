@@ -13,7 +13,7 @@
 // protects shared/library computers.
 
 (function () {
-  const INACTIVITY_LIMIT_MS = 45 * 10 * 10000; // 10 seconds for testing
+  const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
   const COUNTDOWN_SECONDS = 60;
 
   let inactivityTimer = null;
