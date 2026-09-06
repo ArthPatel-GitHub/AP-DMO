@@ -358,6 +358,24 @@ body {
   filter: none;
 }
 
+/* Icon buttons need a stronger disabled signal than text buttons,
+   since a dimmed icon alone can be mistaken for a normal resting
+   state at a glance - text buttons have more visual mass to
+   convey "unavailable", a small icon doesn't. */
+.btn-icon:disabled {
+  opacity: 0.25;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.btn-icon:disabled:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+  transform: none;
+}
+
 .btn-danger {
   background: linear-gradient(135deg, var(--brand-red) 0%, #b91c1c 100%);
   border: none;
