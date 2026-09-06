@@ -3,21 +3,27 @@
 // ==========================================
 // AUTOMATION: AUTO SIGN-OUT ON INACTIVITY
 // ==========================================
-// Runs independently in the background on every page. If a
-// logged-in user doesn't interact with the page for a set
-// period, a warning banner appears with a live countdown and a
-// "I'm still here" button. If they don't respond in time, they
-// are automatically signed out and redirected to the homepage -
-// protects against someone staying logged in on a shared/library
-// computer after walking away.
+// Runs in the background on every page EXCEPT the player.
+// On the player, students often sit still while singing along,
+// so treating that as "inactivity" would kick them out mid-practice.
+// Everywhere else (catalogue, account, contact, etc.), if a
+// logged-in user doesn't interact for 15 minutes, a warning
+// banner appears with a live countdown. If they don't click
+// "I'm still here", they are signed out automatically — this
+// protects shared/library computers.
 
 (function () {
-const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 minutes
-const COUNTDOWN_SECONDS = 60; // 60 second warning countdown
+  const INACTIVITY_LIMIT_MS = 45 * 10 * 10000; // 10 seconds for testing
+  const COUNTDOWN_SECONDS = 60;
 
   let inactivityTimer = null;
   let countdownInterval = null;
   let warningBanner = null;
+
+  function isOnPlayerPage() {
+    const page = (window.location.pathname.split('/').pop() || '').toLowerCase();
+    return page === 'player.html' || page === 'public.html';
+  }
 
   function removeWarningBanner() {
     if (warningBanner) {
@@ -36,13 +42,16 @@ const COUNTDOWN_SECONDS = 60; // 60 second warning countdown
     if (account.isLoggedIn()) {
       account.logOut();
       window.dispatchEvent(new CustomEvent('auth-state-changed'));
-      sessionStorage.setItem('logout_reason', 'You were signed out automatically due to inactivity.');
+      sessionStorage.setItem(
+        'logout_reason',
+        'You were signed out automatically due to inactivity.'
+      );
     }
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
   }
 
   function showWarningBanner() {
-    if (warningBanner) return; // already showing, don't duplicate
+    if (warningBanner || isOnPlayerPage()) return;
 
     let secondsLeft = COUNTDOWN_SECONDS;
 
@@ -86,16 +95,14 @@ const COUNTDOWN_SECONDS = 60; // 60 second warning countdown
     clearTimeout(inactivityTimer);
     removeWarningBanner();
 
+    if (isOnPlayerPage()) return;
+
     const account = new UserAccount();
-    if (!account.isLoggedIn()) return; // nothing to automate for a guest
+    if (!account.isLoggedIn()) return;
 
     inactivityTimer = setTimeout(showWarningBanner, INACTIVITY_LIMIT_MS);
   }
 
-  // Any of these user actions counts as "active" and resets the clock -
-  // but only when the warning banner ISN'T showing, since once it's up
-  // we want the user to make a deliberate choice (click the button),
-  // not have incidental mouse movement silently dismiss it.
   ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach((eventName) => {
     document.addEventListener(eventName, () => {
       if (!warningBanner) resetTimers();

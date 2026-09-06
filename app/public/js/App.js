@@ -57,6 +57,20 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+// If the server redirected here because the requested URL didn't
+// match any real page, show a clear message explaining why -
+// rather than the user just silently landing on the homepage with
+// no idea their original link was broken.
+const urlErrorParams = new URLSearchParams(window.location.search);
+if (urlErrorParams.get('error') === 'notfound') {
+  if (notificationEngine) {
+    notificationEngine.error("That page doesn't exist. We've brought you back to the homepage.");
+  }
+  // Clean the ?error=notfound out of the URL bar so refreshing
+  // the page doesn't show the same message again.
+  window.history.replaceState({}, '', 'index.html');
+}
+
   const catalogueContainer = document.getElementById('songs-container');
   if (catalogueContainer) {
     catalogueContainer.innerHTML = '<p class="text-muted-fallback">⏳ Loading songs...</p>';
@@ -360,6 +374,37 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   const trackTitle = document.createElement('h2');
   trackTitle.className = 'track-heading';
   trackTitle.textContent = activeSong.title;
+
+  // Lets the user copy a direct, shareable link to the currently
+// playing song using the browser's Clipboard API - a small,
+// self-contained addition that doesn't touch any existing logic.
+const copyLinkBtn = document.createElement('button');
+copyLinkBtn.type = 'button';
+copyLinkBtn.className = 'copy-link-btn';
+copyLinkBtn.textContent = '🔗 Copy song link';
+copyLinkBtn.style.display = 'block';
+copyLinkBtn.style.margin = '0 auto 10px auto';
+copyLinkBtn.addEventListener('click', () => {
+  const songUrl = `${window.location.origin}/player.html?song=${songId}`;
+  navigator.clipboard.writeText(songUrl).then(() => {
+    if (notificationEngine) notificationEngine.success('Song link copied to clipboard!');
+
+    // Briefly change the button's own text as an immediate,
+    // localized confirmation right where the user is looking -
+    // a toast in the corner can be easy to miss if their eyes
+    // are still on the button they just clicked.
+    const originalText = copyLinkBtn.textContent;
+    copyLinkBtn.textContent = '✅ Copied to clipboard!';
+    copyLinkBtn.disabled = true;
+
+    setTimeout(() => {
+      copyLinkBtn.textContent = originalText;
+      copyLinkBtn.disabled = false;
+    }, 2000);
+  }).catch(() => {
+    if (notificationEngine) notificationEngine.error('Could not copy link. Please copy the URL manually.');
+  });
+});
 
   // ==========================================
   // MULTI-MODE LYRICS LEARNING MODULE
@@ -731,6 +776,7 @@ function handleStreamSong(songId, shouldPushToHistory = true) {
   playerBox.appendChild(sourceIndicator);
   playerBox.appendChild(trackTitle);
   playerBox.appendChild(controlDashboard);
+  playerBox.appendChild(copyLinkBtn);
   playerBox.appendChild(lyricsModuleContainer);
 
   playerContainer.appendChild(playerBox);

@@ -1935,3 +1935,31 @@ body {
 .favourites-empty-icon {
   color: var(--brand-red);
 }
+/* ==========================================
+   29. COPY LINK BUTTON
+   ========================================== */
+.copy-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.copy-link-btn:hover {
+  color: var(--brand-green);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.copy-link-btn:disabled {
+  color: var(--brand-green);
+  cursor: default;
+  opacity: 1;
+}
