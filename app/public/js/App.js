@@ -123,16 +123,26 @@ if (urlErrorParams.get('error') === 'notfound') {
     });
     
   const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    let debounceTimeoutPointer;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(debounceTimeoutPointer);
-      debounceTimeoutPointer = setTimeout(() => {
-        executeCompoundFiltering();
-        renderSearchSuggestions(searchInput.value);
-      }, 250);
-    });
-  }
+if (searchInput) {
+  let debounceTimeoutPointer;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(debounceTimeoutPointer);
+    debounceTimeoutPointer = setTimeout(() => {
+      executeCompoundFiltering();
+      renderSearchSuggestions(searchInput.value);
+    }, 250);
+  });
+
+  // Re-show suggestions if the user clicks back into the search
+  // bar with existing text still in it - previously the dropdown
+  // only rebuilt on typing, so clicking away and back left it
+  // closed even though the matching text was still there.
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim().length > 0) {
+      renderSearchSuggestions(searchInput.value);
+    }
+  });
+}
 
   if (document.getElementById('songs-container')) {
     window.addEventListener('auth-state-changed', () => {
