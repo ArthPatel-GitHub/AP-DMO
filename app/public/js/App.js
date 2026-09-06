@@ -881,6 +881,11 @@ function handleNavigationForward() {
     return;
   }
 
+  if (songsDatabase.length <= 1) {
+  shuffleButton.disabled = true;
+  shuffleButton.title = 'Shuffle needs at least 2 songs in the catalogue';
+}
+
   if (isShuffleOn) {
     if (shuffleQueue.length === 0) {
       shuffleQueue = buildShuffleQueue();
